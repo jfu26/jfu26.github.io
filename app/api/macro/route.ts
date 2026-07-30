@@ -29,7 +29,7 @@ function asDatum(iso3: string, country: string, year: number, value: unknown): D
   const numeric = Number(value);
   const iso = whereAlpha3(iso3);
   if (!iso || !Number.isFinite(numeric)) return null;
-  return { iso3, mapId: iso.numeric, country, year, value: numeric };
+  return { iso3, mapId: iso.numeric, country: country || iso.country, year, value: numeric };
 }
 
 function observation(
@@ -70,9 +70,9 @@ async function fromWeo(metric: Metric, year: number) {
   });
   return {
     data,
-    sourceLabel: "IMF WEO",
+    sourceLabel: "IMF WEO · Apr 2025",
     sourceUrl: "https://data.imf.org/Datasets/WEO",
-    note: "WEO values include IMF staff projections where the selected year is beyond the latest historical observation.",
+    note: "April 2025 WEO values are served through DBnomics and include IMF staff projections. The new IMF portal currently blocks edge requests, so the vintage is shown explicitly.",
   };
 }
 
