@@ -165,7 +165,7 @@ async function fromGmd(metric: Metric, requestedYear: number) {
     data,
     sourceLabel: "Global Macro Database",
     sourceUrl: "https://www.globalmacrodata.com/",
-    note: "GMD combines and chain-links historical sources. Real GDP growth is calculated from consecutive published real GDP levels; other indicators are shown directly.",
+    note: "Global Macro Database by Müller, Xu, Lehbib & Chen (2025), CC BY-NC-SA 4.0. Real GDP growth is calculated from consecutive published levels; other indicators are shown directly.",
   };
 }
 
