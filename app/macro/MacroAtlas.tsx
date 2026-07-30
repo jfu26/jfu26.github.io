@@ -6,22 +6,28 @@ import { feature } from "topojson-client";
 
 type Metric = "growth" | "inflation" | "debt";
 type Source = "weo" | "gmd" | "dbnomics";
+type Series = {
+  iso3: string;
+  mapId: string;
+  country: string;
+  values: [year: number, value: number][];
+};
+type SourceBlock = {
+  label: string;
+  url: string;
+  note: string;
+  metrics: Record<Metric, Series[]>;
+};
+type Archive = {
+  generatedAt: string;
+  sources: Record<Source, SourceBlock>;
+};
 type Datum = {
   iso3: string;
   mapId: string;
   country: string;
   year: number;
   value: number;
-};
-type Payload = {
-  data: Datum[];
-  metric: Metric;
-  source: Source;
-  requestedYear: number;
-  fetchedAt: string;
-  sourceLabel: string;
-  sourceUrl: string;
-  note?: string;
 };
 type MapFeature = GeoJSON.Feature<GeoJSON.Geometry, { name?: string }> & { id?: string | number };
 
@@ -47,62 +53,58 @@ function color(value: number | undefined, metric: Metric, extent: number) {
   return `color-mix(in srgb, #273633 ${(1 - t) * 100}%, ${target})`;
 }
 
+function atYear(series: Series, requestedYear: number): Datum | null {
+  const exact = series.values.find(([year]) => year === requestedYear);
+  const nearest = exact || [...series.values].reverse().find(([year]) => year <= requestedYear);
+  return nearest
+    ? { iso3: series.iso3, mapId: series.mapId, country: series.country, year: nearest[0], value: nearest[1] }
+    : null;
+}
+
 export default function MacroAtlas() {
   const [metric, setMetric] = useState<Metric>("growth");
   const [source, setSource] = useState<Source>("weo");
   const [year, setYear] = useState(2026);
-  const [payload, setPayload] = useState<Payload | null>(null);
+  const [archive, setArchive] = useState<Archive | null>(null);
   const [features, setFeatures] = useState<MapFeature[]>([]);
-  const [selected, setSelected] = useState<Datum | null>(null);
+  const [selectedIso, setSelectedIso] = useState("CHE");
   const [hovered, setHovered] = useState<Datum | null>(null);
   const [pointer, setPointer] = useState({ x: 0, y: 0 });
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
   const stageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
-      .then((response) => {
+    Promise.all([
+      fetch("/data/world.json").then((response) => {
         if (!response.ok) throw new Error("Map boundaries are unavailable.");
         return response.json();
-      })
-      .then((topology) => {
+      }),
+      fetch("/data/macro.json").then((response) => {
+        if (!response.ok) throw new Error("The daily macro archive is unavailable.");
+        return response.json() as Promise<Archive>;
+      }),
+    ])
+      .then(([topology, macro]) => {
         const collection = feature(topology, topology.objects.countries) as unknown as GeoJSON.FeatureCollection;
         setFeatures(collection.features as MapFeature[]);
+        setArchive(macro);
       })
       .catch((reason) => setError(reason.message));
   }, []);
 
-  useEffect(() => {
-    const controller = new AbortController();
-    fetch(`/api/macro?source=${source}&metric=${metric}&year=${year}`, {
-      signal: controller.signal,
-    })
-      .then(async (response) => {
-        const body = await response.json();
-        if (!response.ok) throw new Error(body.error || "Data source unavailable.");
-        return body as Payload;
-      })
-      .then((next) => {
-        setPayload(next);
-        setSelected(next.data.find((d) => d.iso3 === "CHE") || next.data[0] || null);
-      })
-      .catch((reason) => {
-        if (reason.name !== "AbortError") setError(reason.message);
-      })
-      .finally(() => setLoading(false));
-    return () => controller.abort();
-  }, [metric, source, year]);
-
-  const byId = useMemo(
-    () => new Map(payload?.data.map((datum) => [datum.mapId, datum]) || []),
-    [payload],
+  const sourceBlock = archive?.sources[source];
+  const data = useMemo(
+    () => sourceBlock?.metrics[metric].flatMap((series) => atYear(series, year) || []) || [],
+    [metric, sourceBlock, year],
   );
+  const byId = useMemo(() => new Map(data.map((datum) => [datum.mapId, datum])), [data]);
+  const selected = data.find((datum) => datum.iso3 === selectedIso)
+    || data.find((datum) => datum.iso3 === "CHE")
+    || data[0];
   const extent = useMemo(() => {
-    const values = payload?.data.map((d) => Math.abs(d.value)).filter(Number.isFinite) || [];
-    const sorted = values.sort((a, b) => a - b);
-    return sorted[Math.floor(sorted.length * .9)] || 10;
-  }, [payload]);
+    const values = data.map((datum) => Math.abs(datum.value)).filter(Number.isFinite).sort((a, b) => a - b);
+    return values[Math.floor(values.length * .9)] || 10;
+  }, [data]);
   const path = useMemo(
     () => geoPath(geoEqualEarth().fitExtent([[18, 18], [982, 522]], { type: "Sphere" })),
     [],
@@ -116,15 +118,7 @@ export default function MacroAtlas() {
           <span className="control-label">Indicator</span>
           <div className="control-options">
             {METRICS.map((item) => (
-              <button
-                className={metric === item.id ? "active" : ""}
-                key={item.id}
-                onClick={() => {
-                  setLoading(true);
-                  setError("");
-                  setMetric(item.id);
-                }}
-              >
+              <button className={metric === item.id ? "active" : ""} key={item.id} onClick={() => setMetric(item.id)}>
                 {item.label}
               </button>
             ))}
@@ -134,15 +128,7 @@ export default function MacroAtlas() {
           <span className="control-label">Source</span>
           <div className="control-options">
             {SOURCES.map((item) => (
-              <button
-                className={source === item.id ? "active" : ""}
-                key={item.id}
-                onClick={() => {
-                  setLoading(true);
-                  setError("");
-                  setSource(item.id);
-                }}
-              >
+              <button className={source === item.id ? "active" : ""} key={item.id} onClick={() => setSource(item.id)}>
                 {item.label}
               </button>
             ))}
@@ -157,18 +143,14 @@ export default function MacroAtlas() {
             min="1990"
             max="2030"
             value={year}
-            onChange={(event) => {
-              setLoading(true);
-              setError("");
-              setYear(Number(event.target.value));
-            }}
+            onChange={(event) => setYear(Number(event.target.value))}
           />
           <div className="year-readout"><span>1990</span><strong>{year}</strong><span>2030</span></div>
         </div>
         <p className="source-note">
-          Values are requested from the selected public source. A 24-hour edge
-          cache reduces network and provider load without persisting a local
-          database.
+          GitHub Actions refreshes the public-source snapshot every day. The
+          generated archive is deployed directly and is never committed to
+          this repository.
         </p>
       </aside>
 
@@ -195,12 +177,12 @@ export default function MacroAtlas() {
                 onMouseLeave={() => setHovered(null)}
                 onFocus={() => setHovered(datum || null)}
                 onBlur={() => setHovered(null)}
-                onClick={() => datum && setSelected(datum)}
+                onClick={() => datum && setSelectedIso(datum.iso3)}
               />
             );
           })}
         </svg>
-        {loading && <div className="map-loading">Reading the world economy…</div>}
+        {!archive && !error && <div className="map-loading">Reading the world economy…</div>}
         {error && <div className="map-loading atlas-error">{error}</div>}
         {hovered && (
           <div className="map-tooltip" style={{ left: Math.min(pointer.x, 760), top: Math.min(pointer.y, 460) }}>
@@ -226,15 +208,15 @@ export default function MacroAtlas() {
         </p>
         <div className="detail-meta">
           <div><span>Observation</span><strong>{selected?.year || year}</strong></div>
-          <div><span>Source</span><strong>{payload?.sourceLabel || "—"}</strong></div>
-          <div><span>Coverage</span><strong>{payload?.data.length || 0} economies</strong></div>
-          <div><span>Refresh</span><strong>{payload ? new Date(payload.fetchedAt).toLocaleDateString("en-GB") : "—"}</strong></div>
+          <div><span>Source</span><strong>{sourceBlock?.label || "—"}</strong></div>
+          <div><span>Coverage</span><strong>{data.length} economies</strong></div>
+          <div><span>Refresh</span><strong>{archive ? new Date(archive.generatedAt).toLocaleDateString("en-GB") : "—"}</strong></div>
         </div>
         <p className="detail-copy">
-          {payload?.note || "Country values are shown as published by the source. Missing observations remain unfilled."}
+          {sourceBlock?.note || "Country values are shown as published by the source. Missing observations remain unfilled."}
         </p>
         <div className="source-links">
-          {payload?.sourceUrl && <a href={payload.sourceUrl} target="_blank" rel="noreferrer">Open source ↗</a>}
+          {sourceBlock?.url && <a href={sourceBlock.url} target="_blank" rel="noreferrer">Open source ↗</a>}
           <a href="https://www.worldmonitor.app/docs/documentation" target="_blank" rel="noreferrer">Interface inspiration: World Monitor ↗</a>
         </div>
       </aside>
