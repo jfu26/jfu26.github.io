@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/components/SiteFooter";
 import MacroAtlas from "./MacroAtlas";
 
 export const metadata: Metadata = {
@@ -10,14 +11,7 @@ export const metadata: Metadata = {
 export default function MacroPage() {
   return (
     <main className="atlas-page">
-      <header className="plain-header">
-        <Link className="site-name" href="/">J. Fu</Link>
-        <nav aria-label="Primary navigation">
-          <Link href="/">Profile</Link>
-          <Link href="/#research">Research</Link>
-          <Link aria-current="page" href="/macro">Macro Atlas</Link>
-        </nav>
-      </header>
+      <SiteHeader />
       <section className="atlas-title">
         <p className="overline">Open data</p>
         <h1>Global Macro Atlas</h1>
@@ -27,6 +21,7 @@ export default function MacroPage() {
         </p>
       </section>
       <MacroAtlas />
+      <SiteFooter />
     </main>
   );
 }

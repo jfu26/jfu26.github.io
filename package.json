@@ -9,16 +9,20 @@
   "scripts": {
     "dev": "next dev",
     "data": "node scripts/fetch-macro.mjs",
-    "build": "next build",
+    "content:check": "node scripts/validate-content.mjs",
+    "build": "pnpm content:check && next build",
     "start": "next start",
     "lint": "eslint . --ignore-pattern out --ignore-pattern .next"
   },
   "dependencies": {
     "d3-geo": "3.1.1",
+    "gray-matter": "^4.0.3",
     "iso-3166-1": "2.1.1",
+    "marked": "^18.0.7",
     "next": "16.2.6",
     "react": "19.2.6",
     "react-dom": "19.2.6",
+    "reveal.js": "^6.0.1",
     "topojson-client": "3.1.0"
   },
   "devDependencies": {

@@ -1,0 +1,31 @@
+---
+title: Local Projections in One Page
+date: 2026-08-01
+summary: The estimating equation, interpretation, and a minimal R specification for impulse responses.
+tags:
+  - Econometrics
+  - Macroeconomics
+  - R
+---
+
+For horizon $h$, a local projection estimates a separate regression
+
+$$
+y_{t+h}-y_{t-1}=\alpha_h+\beta_h\varepsilon_t+\Gamma_h'X_{t-1}+u_{t+h}.
+$$
+
+The sequence $\{\beta_h\}_{h=0}^H$ traces the response of $y$ to the identified shock $\varepsilon_t$. Each horizon is estimated directly, so misspecification does not compound through recursive iteration as it can in a VAR.
+
+```r
+horizons <- 0:12
+irf <- lapply(horizons, function(h) {
+  fit <- lm(dplyr::lead(y, h) - dplyr::lag(y) ~ shock + lags, data = df)
+  coef(fit)[["shock"]]
+})
+```
+
+## Identification remains the hard part
+
+Local projections change the propagation estimator, not the source of exogenous variation. A causal interpretation of $\beta_h$ still requires a defensible shock, timing convention, and information set.
+
+Standard errors must also reflect overlapping outcomes when $h>0$. In annual or quarterly macroeconomic applications, heteroskedasticity-and-autocorrelation robust inference is usually the minimum starting point.

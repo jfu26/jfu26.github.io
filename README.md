@@ -1,7 +1,9 @@
 # jfu26.github.io
 
-Academic website for an incoming Economics PhD researcher at the Geneva
-Graduate Institute.
+Academic website for an incoming Economics PhD student at the Geneva Graduate
+Institute. The site combines an al-folio-style academic content architecture
+with static Markdown, BibTeX, DOI, Jupyter, RMarkdown, MathJax, and reveal.js
+publishing.
 
 ## Development
 
@@ -10,6 +12,10 @@ pnpm install
 pnpm data
 pnpm dev
 ```
+
+Run `pnpm content:check` to validate content metadata and duplicate slugs. See
+[`ARCHITECTURE.md`](ARCHITECTURE.md) and [`content/README.md`](content/README.md)
+for the content model and authoring conventions.
 
 `pnpm data` reads the complete IMF WEO and harmonized Global Macro Database
 indicator sets into ignored, per-indicator build assets. It also creates the

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Cormorant_Garamond, DM_Sans, IBM_Plex_Mono } from "next/font/google";
+import MathJaxSync from "@/components/MathJaxSync";
 import "./globals.css";
 
 const serif = Cormorant_Garamond({
@@ -37,10 +39,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <head>
-        <script dangerouslySetInnerHTML={{ __html: `window.MathJax={tex:{inlineMath:[["\\\\(","\\\\)"]],displayMath:[["\\\\[","\\\\]"]]},chtml:{displayAlign:"left"},options:{enableMenu:false}};` }} />
+        <script dangerouslySetInnerHTML={{ __html: `window.MathJax={tex:{inlineMath:[["$","$"],["\\\\(","\\\\)"]],displayMath:[["$$","$$"],["\\\\[","\\\\]"]],processEscapes:true},chtml:{displayAlign:"left"},options:{enableMenu:false}};` }} />
         <script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" />
       </head>
-      <body className={`${serif.variable} ${sans.variable} ${mono.variable}`}>{children}</body>
+      <body className={`${serif.variable} ${sans.variable} ${mono.variable}`}>
+        <Suspense><MathJaxSync /></Suspense>
+        {children}
+      </body>
     </html>
   );
 }
