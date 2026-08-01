@@ -50,24 +50,34 @@ function makeSeries(iso3, values, name = "") {
   return country && clean.length ? { iso3, ...country, values: clean } : null;
 }
 
-async function fetchJson(url, timeout = 45_000) {
-  const response = await fetch(url, {
-    headers: { Accept: "application/json" },
-    signal: AbortSignal.timeout(timeout),
-  });
-  if (!response.ok) throw new Error(`${response.status} from ${url}`);
-  return response.json();
+async function fetchJson(url, timeout = 45_000, attempts = 1) {
+  let lastError;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      const response = await fetch(url, {
+        headers: { Accept: "application/json" },
+        signal: AbortSignal.timeout(timeout),
+      });
+      if (!response.ok) throw new Error(`${response.status} from ${url}`);
+      return response.json();
+    } catch (error) {
+      lastError = error;
+      if (attempt < attempts) await new Promise((resolve) => setTimeout(resolve, attempt * 750));
+    }
+  }
+  throw lastError;
 }
 
 async function fetchWeo() {
   try {
-    const entries = await Promise.all(Object.entries(WEO).map(async ([id, [label, unit, category]]) => {
-      const body = await fetchJson(`https://www.imf.org/external/datamapper/api/v2/${id}`);
+    const entries = [];
+    for (const [id, [label, unit, category]] of Object.entries(WEO)) {
+      const body = await fetchJson(`https://www.imf.org/external/datamapper/api/v2/${id}`, 20_000, 3);
       const series = Object.entries(body.values?.[id] || {})
         .map(([iso3, values]) => makeSeries(iso3, Object.entries(values)))
         .filter(Boolean);
-      return [id, { label, unit, category, series }];
-    }));
+      entries.push([id, { label, unit, category, series }]);
+    }
     return {
       label: "IMF World Economic Outlook",
       url: "https://www.imf.org/external/datamapper/datasets/WEO",
