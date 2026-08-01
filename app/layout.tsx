@@ -22,35 +22,25 @@ const mono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://jfu26.github.io"),
-  title: {
-    default: "J. Fu — Economics",
-    template: "%s — J. Fu",
-  },
-  description:
-    "Academic website of J. Fu, incoming Economics PhD researcher at the Geneva Graduate Institute.",
+  title: { default: "J. Fu — Economics", template: "%s — J. Fu" },
+  description: "Academic website of J. Fu, an incoming Economics PhD student at the Geneva Graduate Institute.",
   icons: { icon: "/favicon.svg" },
   openGraph: {
     title: "J. Fu — Economics",
-    description: "Incoming Economics PhD · Geneva · 2026",
+    description: "Incoming Economics PhD student · Geneva · 2026",
     url: "https://jfu26.github.io",
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "J. Fu — Economics · Geneva" }],
   },
-  twitter: {
-    card: "summary_large_image",
-    title: "J. Fu — Economics",
-    description: "Incoming Economics PhD · Geneva · 2026",
-    images: ["/og.png"],
-  },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${serif.variable} ${sans.variable} ${mono.variable}`}>
-        {children}
-      </body>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: `window.MathJax={tex:{inlineMath:[["\\\\(","\\\\)"]],displayMath:[["\\\\[","\\\\]"]]},chtml:{displayAlign:"left"},options:{enableMenu:false}};` }} />
+        <script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" />
+      </head>
+      <body className={`${serif.variable} ${sans.variable} ${mono.variable}`}>{children}</body>
     </html>
   );
 }

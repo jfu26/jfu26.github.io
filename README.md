@@ -11,8 +11,10 @@ pnpm data
 pnpm dev
 ```
 
-`pnpm data` reads current public macroeconomic sources into ignored local build
-assets. The repository never tracks these generated files.
+`pnpm data` reads the complete IMF WEO and harmonized Global Macro Database
+indicator sets into ignored, per-indicator build assets. It also creates the
+complete DBnomics/WDI catalog; DBnomics observations load on demand in the
+browser. The repository never tracks generated data files.
 
 ## Publishing
 

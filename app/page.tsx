@@ -4,135 +4,100 @@ const Arrow = () => <span aria-hidden="true">↗</span>;
 
 export default function Home() {
   return (
-    <main className="home-shell">
-      <header className="site-header">
-        <Link className="wordmark" href="/" aria-label="J. Fu, home">
-          JF<span>.</span>
-        </Link>
+    <main className="site-shell">
+      <header className="plain-header">
+        <Link className="site-name" href="/">J. Fu</Link>
         <nav aria-label="Primary navigation">
           <a href="#research">Research</a>
-          <a href="#about">About</a>
+          <a href="#education">Education</a>
           <Link href="/macro">Macro Atlas</Link>
           <a href="#contact">Contact</a>
         </nav>
-        <span className="header-place">Geneva · CH</span>
       </header>
 
-      <section className="hero">
-        <div className="hero-copy">
-          <p className="eyebrow">Economics PhD · Incoming 2026</p>
-          <h1>
-            J. Fu
-            <span>Economist in formation.</span>
-          </h1>
-          <p className="hero-intro">
-            Incoming doctoral researcher in Economics at the Geneva Graduate
-            Institute, interested in how expectations, institutions, and
-            global linkages shape economic outcomes.
-          </p>
-          <div className="hero-links">
-            <a href="#research">View research notes <span>↓</span></a>
-            <Link href="/macro">Explore macro data <Arrow /></Link>
-          </div>
-        </div>
-
-        <div className="phase-field" aria-label="A stylized economic phase diagram">
-          <span className="axis axis-x">state, x</span>
-          <span className="axis axis-y">belief, E<sub>t</sub>x<sub>t+1</sub></span>
-          <div className="orbit orbit-a" />
-          <div className="orbit orbit-b" />
-          <div className="equilibrium">
-            <i />
-            <span>x<sup>*</sup></span>
-          </div>
-          <p className="field-note">
-            equilibrium as a fixed point
-            <br />
-            x<sup>*</sup> = T(x<sup>*</sup>)
-          </p>
-        </div>
-
-        <div className="hero-index" aria-hidden="true">01 / 04</div>
-      </section>
-
-      <section className="coordinates" id="about">
-        <div className="section-label">
-          <span>Current coordinates</span>
-          <small>46.2044° N, 6.1432° E</small>
-        </div>
-        <div className="coordinate-grid">
-          <article>
-            <p className="date">Sep 2026</p>
-            <h2>PhD in Economics</h2>
-            <p>Geneva Graduate Institute (IHEID)</p>
-            <span className="status">Incoming</span>
-          </article>
-          <article>
-            <p className="date">Aug 2026 — Aug 2027</p>
-            <h2>Beginning Doctoral Program</h2>
-            <p>Study Center Gerzensee, Switzerland</p>
-            <span className="status">Cohort 2026</span>
-          </article>
-        </div>
-      </section>
-
-      <section className="research-section" id="research">
-        <div className="section-label">
-          <span>Research</span>
-          <small>Agenda in development</small>
-        </div>
-        <div className="research-lead">
-          <h2>Questions before answers.</h2>
-          <p>
-            This space will host working papers, research notes, and replication
-            materials. For now, it records the questions and tools that will
-            guide the work ahead.
-          </p>
-        </div>
-        <div className="research-grid">
-          <article>
-            <span className="note-no">I</span>
-            <h3>Expectations</h3>
-            <p>How do beliefs propagate through aggregate dynamics?</p>
-            <code>E<sub>t</sub>[x<sub>t+1</sub>] = ∫x dF<sub>t</sub>(x)</code>
-          </article>
-          <article>
-            <span className="note-no">II</span>
-            <h3>Institutions</h3>
-            <p>When do rules discipline policy, and when do they bind?</p>
-            <code>V(s) = max<sub>a</sub> &#123;u(s,a) + βEV(s&apos;)&#125;</code>
-          </article>
-          <article>
-            <span className="note-no">III</span>
-            <h3>Global linkages</h3>
-            <p>What travels across borders, and what remains local?</p>
-            <code>Y = C + I + G + NX</code>
-          </article>
-        </div>
-      </section>
-
-      <section className="atlas-callout">
-        <div>
-          <p className="eyebrow">Open data experiment · 02</p>
-          <h2>A living view of the world economy.</h2>
-        </div>
-        <p>
-          Compare growth, inflation, and public debt across countries using
-          open macroeconomic sources. Data are fetched on demand and never
-          stored in this repository.
+      <section className="intro" aria-labelledby="intro-title">
+        <p className="overline">Economics · Geneva</p>
+        <h1 id="intro-title">J. Fu</h1>
+        <p className="intro-role">
+          Incoming PhD student in Economics at the Geneva Graduate Institute
+          (IHEID), beginning September 2026.
         </p>
-        <Link href="/macro" className="round-link" aria-label="Open Macro Atlas">
-          <Arrow />
-        </Link>
+        <p className="intro-copy">
+          I am interested in macroeconomics, expectations, institutions, and
+          international economic linkages. My research agenda is currently in
+          development.
+        </p>
+        <p className="research-equation" aria-label="Expected future state conditional on current information">
+          {String.raw`\(\mathbb{E}_t[x_{t+1}\mid\mathcal{I}_t]\)`}
+          <span>beliefs, states, and aggregate outcomes</span>
+        </p>
       </section>
 
-      <footer id="contact">
-        <div>
-          <span>J. Fu</span>
-          <p>Economics · Geneva</p>
+      <section className="plain-section" id="research">
+        <h2>Research</h2>
+        <div className="section-body">
+          <p className="section-intro">
+            Current interests. Papers, notes, and replication materials will be
+            added as the work develops.
+          </p>
+          <ul className="text-list">
+            <li>
+              <span>Expectations and aggregate dynamics</span>
+              <span className="list-math">{String.raw`\(x_t=T(\mathbb{E}_t x_{t+1})\)`}</span>
+            </li>
+            <li>
+              <span>Institutions and policy</span>
+              <span className="list-math">{String.raw`\(V(s)=\max_a\{u(s,a)+\beta\,\mathbb{E}V(s')\}\)`}</span>
+            </li>
+            <li>
+              <span>International macroeconomics</span>
+              <span className="list-math">{String.raw`\(Y=C+I+G+NX\)`}</span>
+            </li>
+          </ul>
         </div>
-        <p className="footer-note">Full biography, CV, and contact details forthcoming.</p>
-        <a href="mailto:email@forthcoming.example">Email forthcoming <Arrow /></a>
+      </section>
+
+      <section className="plain-section" id="education">
+        <h2>Education</h2>
+        <div className="section-body">
+          <ol className="dated-list">
+            <li>
+              <time>2026–</time>
+              <div>
+                <strong>PhD in Economics</strong>
+                <span>Geneva Graduate Institute (IHEID)</span>
+              </div>
+            </li>
+            <li>
+              <time>2026–27</time>
+              <div>
+                <strong>Beginning Doctoral Program</strong>
+                <span>Study Center Gerzensee, Switzerland · Aug 2026–Aug 2027</span>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <section className="plain-section">
+        <h2>Data</h2>
+        <div className="section-body">
+          <div className="project-row">
+            <div>
+              <h3>Global Macro Atlas</h3>
+              <p>
+                Interactive country-level macroeconomic data from IMF WEO,
+                Global Macro Database, and DBnomics.
+              </p>
+            </div>
+            <Link href="/macro">Open atlas <Arrow /></Link>
+          </div>
+        </div>
+      </section>
+
+      <footer className="plain-footer" id="contact">
+        <span>J. Fu · Geneva, Switzerland</span>
+        <span>CV and contact details forthcoming.</span>
       </footer>
     </main>
   );
