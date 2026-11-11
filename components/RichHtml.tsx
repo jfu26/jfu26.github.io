@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { figures } from "./figures";
 import Prose from "./Prose";
+import "./figures/figures.css";
 
 const FIGURE = /<figure data-figure="([\w-]+)"(?: id="([^"]*)")?>([\s\S]*?)<\/figure>/g;
 

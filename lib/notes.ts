@@ -2,16 +2,19 @@ import "server-only";
 
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import matter from "gray-matter";
+import { renderMarkdown, slugify } from "./content";
 import { renderTex, type Macros } from "./math";
 
 /*
- * LaTeX lecture notes → chaptered HTML.
+ * Notes: content/notes/<slug>/ holds either a LaTeX course (notes.tex + meta.json,
+ * one page per \section) or a single Markdown note (index.md). sections.json orders them.
  *
- * This converts the LaTeX subset used in content/notes/<course>/notes.tex (article class,
+ * The LaTeX converter handles the LaTeX subset used in content/notes/<course>/notes.tex (article class,
  * amsthm/thmtools theorems, a `whybox` tcolorbox, lists, booktabs tables, figures)
  * at build time. Each \section becomes one page. Numbering follows LaTeX:
  * sections, theorem-like environments within sections, equations continuously.
- * Math is rendered by KaTeX with the document's own \newcommand macros.
+ * Math is rendered to MathML (Temml) with the document's own \newcommand macros.
  * Figures are replaced by interactive components named in meta.json; any other
  * TikZ picture points readers to the PDF.
  */
@@ -29,20 +32,24 @@ export type NoteChapter = {
   sections: NoteSection[];
 };
 export type NoteCourse = {
+  kind: "course";
   slug: string;
   title: string;
+  section: string;
   course: string;
   institution: string;
   credit: string;
   date: string;
   order: number;
-  abstract: string;
   pdf: string;
   source: string;
   chapters: NoteChapter[];
 };
+export type NotePage = { kind: "page"; slug: string; title: string; section: string; date: string; order: number; html: string };
+export type Note = NoteCourse | NotePage;
+export type NoteSectionGroup = { id: string; title: string; groups?: { id: string; title: string }[] };
 
-type Meta = Omit<NoteCourse, "slug" | "abstract" | "pdf" | "source" | "chapters"> & { figures?: Record<string, string> };
+type Meta = Omit<NoteCourse, "kind" | "slug" | "pdf" | "source" | "chapters"> & { figures?: Record<string, string> };
 type Label = { number: string; chapter: string; id: string; kind: "section" | "eq" | "other" };
 
 const THEOREMS: Record<string, string> = {
@@ -76,10 +83,6 @@ function readGroup(text: string, at: number, optional = false): [string | undefi
   if (text[i] !== (optional ? "[" : "{")) return [undefined, at];
   const end = groupEnd(text, i);
   return [text.slice(i + 1, end - 1), end];
-}
-
-export function slugify(value: string) {
-  return value.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
 const escapeHtml = (value: string) => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -492,12 +495,10 @@ function loadCourse(slug: string): NoteCourse {
   const pdf = `/notes/${slug}.pdf`;
   const converter = new Converter(slug, parseMacros(preamble), meta, pdf);
 
-  const abstractMatch = document.match(/\\begin\{minipage\}\{[^}]*\}([\s\S]*?)\\end\{minipage\}/);
   const contentsAt = document.indexOf("\\tableofcontents");
   const body = document.slice(contentsAt >= 0 ? contentsAt : 0);
   const mainStart = body.search(/\\(part|section)\*?\{/);
   const main = converter.extractMath(body.slice(mainStart));
-  const abstractTex = converter.extractMath((abstractMatch?.[1] ?? "").replace(/\\noindent\\textsc\{Abstract\.\}\\enspace/, ""));
 
   // Split into chapters at \section; \part titles group the chapters that follow.
   type Raw = { slug: string; number: string | null; title: string; part?: string; text: string };
@@ -531,24 +532,32 @@ function loadCourse(slug: string): NoteCourse {
 
   for (const warning of converter.warnings) console.warn(`[notes:${slug}] ${warning}`);
   return {
+    kind: "course",
     slug,
     ...meta,
-    abstract: converter.render("", abstractTex).html,
     pdf,
     source: `/notes/${slug}/source.tex`,
     chapters,
   };
 }
 
-let cache: NoteCourse[] | undefined;
-export function getCourses(): NoteCourse[] {
+function loadPage(slug: string): NotePage {
+  const { data, content } = matter(readFileSync(join(ROOT, slug, "index.md"), "utf8"));
+  const date = data.date instanceof Date ? data.date.toISOString().slice(0, 10) : String(data.date ?? "");
+  return { kind: "page", slug, title: String(data.title), section: String(data.section), date, order: Number(data.order ?? 0), html: renderMarkdown(content) };
+}
+
+let cache: Note[] | undefined;
+/** All notes, newest first within equal `order`. */
+export function getNotes(): Note[] {
   cache ??= readdirSync(ROOT, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory() && existsSync(join(ROOT, entry.name, "notes.tex")))
-    .map((entry) => loadCourse(entry.name))
-    .sort((a, b) => a.order - b.order);
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => existsSync(join(ROOT, entry.name, "notes.tex")) ? loadCourse(entry.name) : loadPage(entry.name))
+    .sort((a, b) => a.order - b.order || b.date.localeCompare(a.date));
   return cache;
 }
 
-export function getCourse(slug: string) {
-  return getCourses().find((course) => course.slug === slug);
-}
+export const getNote = (slug: string) => getNotes().find((note) => note.slug === slug);
+export const getCourses = () => getNotes().filter((note): note is NoteCourse => note.kind === "course");
+export const getCourse = (slug: string) => getCourses().find((course) => course.slug === slug);
+export const noteSections: NoteSectionGroup[] = JSON.parse(readFileSync(join(ROOT, "sections.json"), "utf8"));

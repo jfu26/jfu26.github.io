@@ -1,42 +1,40 @@
-import { readFileSync, readdirSync } from "node:fs";
-import { extname, join, parse } from "node:path";
+// Fails the build early on malformed notes: each folder is a LaTeX course
+// (notes.tex + meta.json + public/notes/<slug>.pdf) or a Markdown note (index.md),
+// and every note belongs to a section declared in content/notes/sections.json.
+import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 import matter from "gray-matter";
 
-const root = join(process.cwd(), "content");
+const root = join(process.cwd(), "content", "notes");
+const sections = JSON.parse(readFileSync(join(root, "sections.json"), "utf8"))
+  .flatMap((s) => (s.groups ? s.groups.map((g) => `${s.id}/${g.id}`) : [s.id]));
 const errors = [];
-const slugs = new Set();
-const required = ["title", "date", "summary"];
+let count = 0;
 
-function recordSlug(file) {
-  const slug = parse(file).name;
-  if (slugs.has(slug)) errors.push(`Duplicate content slug: ${slug}`);
-  slugs.add(slug);
-}
-
-function validateMarkdown(directory, extensions) {
-  for (const file of readdirSync(join(root, directory))) {
-    if (!extensions.includes(extname(file).toLowerCase())) continue;
-    recordSlug(file);
-    const { data, content } = matter(readFileSync(join(root, directory, file), "utf8"));
-    for (const field of required) if (!data[field]) errors.push(`${directory}/${file}: missing ${field}`);
-    if (!content.trim()) errors.push(`${directory}/${file}: empty body`);
+for (const entry of readdirSync(root, { withFileTypes: true })) {
+  if (!entry.isDirectory()) continue;
+  const dir = join(root, entry.name);
+  const where = `content/notes/${entry.name}`;
+  let fields;
+  if (existsSync(join(dir, "notes.tex"))) {
+    fields = JSON.parse(readFileSync(join(dir, "meta.json"), "utf8"));
+    for (const key of ["title", "course", "institution", "date", "order"]) if (fields[key] === undefined) errors.push(`${where}/meta.json: missing ${key}`);
+    if (!existsSync(join(process.cwd(), "public", "notes", `${entry.name}.pdf`))) errors.push(`${where}: missing public/notes/${entry.name}.pdf`);
+  } else if (existsSync(join(dir, "index.md"))) {
+    const { data, content } = matter(readFileSync(join(dir, "index.md"), "utf8"));
+    fields = data;
+    for (const key of ["title", "date"]) if (!data[key]) errors.push(`${where}/index.md: missing ${key}`);
+    if (!content.trim()) errors.push(`${where}/index.md: empty body`);
+  } else {
+    errors.push(`${where}: expected notes.tex + meta.json or index.md`);
+    continue;
   }
-}
-
-validateMarkdown("posts", [".md", ".rmd", ".html"]);
-validateMarkdown("slides", [".md"]);
-
-for (const file of readdirSync(join(root, "notebooks"))) {
-  if (extname(file) !== ".ipynb") continue;
-  recordSlug(file);
-  const notebook = JSON.parse(readFileSync(join(root, "notebooks", file), "utf8"));
-  for (const field of required) if (!notebook.metadata?.jfu26?.[field]) errors.push(`notebooks/${file}: missing metadata.jfu26.${field}`);
-  if (notebook.nbformat !== 4) errors.push(`notebooks/${file}: expected nbformat 4`);
-  if (!notebook.cells?.length) errors.push(`notebooks/${file}: no cells`);
+  if (!sections.includes(fields.section)) errors.push(`${where}: section "${fields.section}" is not in sections.json (${sections.join(", ")})`);
+  count += 1;
 }
 
 if (errors.length) {
   console.error(errors.join("\n"));
   process.exit(1);
 }
-console.log(`Content validated: ${slugs.size} posts, notebooks, and slide decks.`);
+console.log(`Content validated: ${count} notes.`);

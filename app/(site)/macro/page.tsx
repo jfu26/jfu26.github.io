@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import MacroAtlas from "./MacroAtlas";
+import "./atlas.css";
 
 export const metadata: Metadata = {
   title: "Global Macro Atlas",

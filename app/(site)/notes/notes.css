@@ -1,0 +1,88 @@
+/* Notes: course contents and chapter pages (loaded under /notes/ only). */
+.course-credit { margin-top: 28px; font-size: 14.5px; font-style: italic; }
+.toc, .toc-sections { margin: 0; padding: 0; list-style: none; }
+.toc a { display: flex; gap: 10px; color: var(--ink); }
+.toc .secnum { flex: none; min-width: 1.6em; color: var(--muted); font: 14px/1.9 var(--sans); }
+.toc-sections { margin: 2px 0 8px 2.1em; font-size: .93em; }
+.toc-sections a { color: var(--muted); }
+.toc-sections .secnum { min-width: 2.4em; font-size: 13px; }
+.toc-part { margin: 18px 0 6px; color: var(--muted); font: 600 12.5px/1.4 var(--sans); letter-spacing: .04em; text-transform: uppercase; }
+.course-toc .toc > li { margin-bottom: 6px; }
+.course-toc .toc > li > a { font-weight: 600; }
+
+.notes-layout {
+  display: grid;
+  grid-template-columns: 250px minmax(0, var(--measure));
+  justify-content: center;
+  gap: 56px;
+  width: min(100vw - 48px, 1100px);
+  margin-inline: calc((100% - min(100vw - 48px, 1100px)) / 2);
+}
+.notes-sidebar { position: sticky; top: 0; align-self: start; max-height: 100dvh; overflow-y: auto; padding: 34px 6px 24px 0; font: 14px/1.45 var(--sans); scrollbar-width: thin; }
+.notes-sidebar-title { display: block; margin-bottom: 4px; color: var(--ink); font: 600 15.5px/1.35 var(--serif); }
+.notes-sidebar .toc a { padding: 3px 0; }
+.notes-sidebar .toc .secnum { font-size: 13px; line-height: 1.45; }
+.notes-sidebar .toc a[aria-current="page"] { color: var(--accent); font-weight: 600; }
+.notes-sidebar .toc-sections { margin-left: 1.9em; border-left: 1px solid var(--line); padding-left: 10px; }
+.notes-sidebar .toc-sections .secnum { display: none; }
+.notes-mobile-toc { display: none; }
+.chapter-header { padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.chapter-header .overline { margin: 18px 0 4px; }
+.chapter-header h1 { display: flex; gap: 14px; margin: 10px 0 0; font-size: 30px; }
+.chapter-header .secnum { color: var(--muted); font-weight: 400; }
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--line); font: 15px/1.4 var(--sans); }
+.pager a { display: flex; flex-direction: column; gap: 2px; }
+.pager a span:first-child { color: var(--muted); font-size: 13px; }
+.pager a[rel="next"] { grid-column: 2; text-align: right; }
+
+/* LaTeX environments produced by lib/notes.ts */
+.notes-prose h2 { scroll-margin-top: 16px; }
+.notes-prose .secnum { margin-right: .6em; color: var(--muted); font-weight: 400; }
+.notes-prose .equation { display: block; overflow-x: auto; overflow-y: hidden; margin: .6em 0; scroll-margin-top: 16px; }
+.notes-prose .equation:target, .thm:target, .table-float:target, figure:target { background: color-mix(in srgb, var(--accent) 9%, transparent); }
+.runin { font-weight: 600; }
+.thm { margin: 1.3em 0; scroll-margin-top: 16px; }
+.thm > p:first-child { margin-top: 0; }
+.thm-head { margin-bottom: .3em; }
+.thm-head strong { font-weight: 600; }
+.thm-note { font-style: normal; }
+.thm-theorem { padding: 12px 16px; border-left: 3px solid var(--accent); background: var(--surface); }
+.thm-theorem > p:not(.thm-head) { font-style: italic; }
+.thm-theorem > p:last-child, .why > p:last-child { margin-bottom: 0; }
+.why { margin: 1.3em 0; padding: 12px 16px; border: 1px solid var(--line); border-radius: 4px; font-size: .95em; }
+.why-head { margin-top: 0; }
+.why-head span { margin-right: 6px; color: var(--accent); font: 600 12px/1 var(--sans); letter-spacing: .05em; text-transform: uppercase; }
+.proof { margin: .6em 0 1.3em; }
+.proof > summary { width: fit-content; cursor: pointer; color: var(--muted); font-style: italic; }
+.proof > summary:hover { color: var(--accent); }
+.proof[open] > summary { margin-bottom: .4em; }
+.proof[open] { padding-left: 14px; border-left: 1px solid var(--line); }
+.qed { margin: 0; text-align: right; }
+.list-roman { list-style: lower-roman; }
+.list-alpha { list-style: lower-alpha; }
+.list-plain { padding-left: 0; list-style: none; }
+.table-float { margin: 1.8em 0; }
+.table-float figcaption { margin: 0 0 6px; color: var(--muted); font: 14px/1.5 var(--sans); }
+.table-wrap { overflow-x: auto; }
+.table-wrap table { margin: 0; }
+.figure-fallback { padding: 12px 16px; border: 1px dashed var(--line); color: var(--muted); font: 14.5px/1.5 var(--sans); }
+
+@media (max-width: 960px) {
+  .notes-layout { display: block; width: auto; margin-inline: 0; }
+  .notes-sidebar { display: none; }
+  .notes-mobile-toc {
+    display: block;
+    margin: 14px 0 4px;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    font: 14.5px/1.5 var(--sans);
+    summary { cursor: pointer; font-weight: 600; }
+    .toc a[aria-current="page"] { color: var(--accent); }
+  }
+}
+
+@media print {
+  .notes-sidebar, .notes-mobile-toc, .pager { display: none; }
+  .notes-layout { display: block; width: 100%; margin: 0; }
+}

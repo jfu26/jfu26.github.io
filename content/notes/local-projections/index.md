@@ -2,10 +2,7 @@
 title: Local Projections in One Page
 date: 2026-08-01
 summary: The estimating equation, interpretation, and a minimal R specification for impulse responses.
-tags:
-  - Econometrics
-  - Macroeconomics
-  - R
+section: others
 ---
 
 For horizon $h$, a local projection estimates a separate regression

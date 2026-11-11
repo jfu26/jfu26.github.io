@@ -1,48 +1,45 @@
 # Website architecture
 
-The site is a statically exported Next.js academic website. Content, rendering,
-and routes have separate responsibilities.
+A statically exported Next.js site. Content, parsing and presentation are separate.
 
 ```text
-content/                  Human-owned academic source files
-  profile.json           Name, role, interests, education, experience (home, Research, CV)
-  publications.bib       BibTeX publication records
-  dois.txt               DOI records imported from Crossref at build time
-  notes/<course>/         LaTeX lecture notes: notes.tex + meta.json (PDF in public/notes/)
-  posts/                  Markdown, RMarkdown, and HTML notes (inline HTML/JS allowed)
-  notebooks/              Jupyter notebooks with code and stored outputs
-  slides/                 reveal.js Markdown decks
-lib/content.ts            Parsing and normalization boundary for posts, slides, papers, profile
-lib/notes.ts              LaTeX → chaptered HTML converter for content/notes (numbering, refs, environments)
-lib/math.ts               Build-time TeX → MathML (Temml); no math JavaScript ships to readers
-components/               Shared academic layout and content renderers
-  RichHtml.tsx           Renders build-time HTML and mounts <figure data-figure="id"> placeholders
-  figures/               Interactive SVG figures (draggable, keyboard-operable), one chunk each
-  Prose.tsx              Runs author <script> tags in order, for HTML that still carries them
-app/(site)/               Site pages sharing one header/footer layout
-app/slides/               Full-screen reveal.js decks, outside the site shell
-scripts/                  Content validation and macro-data ingestion
-public/data/              Generated deployment data; ignored by Git
+content/                    Human-owned source (see content/README.md)
+  profile.json              Name, role, bio, interests, education, experience
+  publications.bib, dois.txt Papers listed on Research
+  notes/sections.json       Notes shelves: Gerzensee (micro/macro/metrics), Master, Others
+  notes/<slug>/             notes.tex + meta.json (LaTeX course) or index.md (single note)
+lib/
+  content.ts                Profile, Markdown rendering, BibTeX/DOI parsing
+  notes.ts                  Notes loader and LaTeX → chaptered HTML converter
+  math.ts                   TeX → MathML (Temml) at build time
+components/
+  RichHtml.tsx              Build-time HTML + mounts <figure data-figure="id"> figures
+  figures/                  Interactive SVG figures (drag + keyboard), one chunk each
+  NotesToc.tsx, CvList.tsx, Site*.tsx, Prose.tsx, PrintButton.tsx
+app/
+  layout.tsx, globals.css   Root document, fonts, base styles, Person JSON-LD
+  (site)/                   Home, research, notes, cv, macro (shared header/footer)
+  (site)/notes/notes.css    Notes-only styles (LaTeX environments, contents sidebar)
+  (site)/macro/atlas.css    Atlas-only styles
+  sitemap.ts, robots.ts
+scripts/                    Content validation, macro-data ingestion
 ```
 
 ## Build flow
 
-1. `pnpm content:check` validates front matter, notebook metadata, and unique slugs.
-2. `pnpm data` retrieves macroeconomic data into ignored, per-indicator files.
-3. `next build` reads academic content, imports DOI metadata, generates every
-   dynamic route through `generateStaticParams`, and exports the site to `out/`.
-4. GitHub Actions publishes `out/` to GitHub Pages.
+1. `pnpm content:check` validates every notes folder and its section.
+2. `pnpm data` downloads macro data into ignored files under `public/data/`.
+3. `next build` renders all pages, TeX and Markdown to static HTML in `out/`.
+4. GitHub Actions publishes `out/` to GitHub Pages on every push to `main`.
 
-## Ownership rules
+## Rules
 
-- Research content belongs under `content/`, never in a React component.
-- `lib/content.ts` and `lib/notes.ts` are the only modules that read the content filesystem.
-- Math is rendered at build time to MathML; pages load no math library. Slides are the
-  exception: reveal renders Markdown in the browser, so decks use its KaTeX plugin.
-- Interactive figures are React SVG components registered in `components/figures/index.ts`
-  and referenced from content by id; content never ships plotting libraries or inline JS.
-- Components render normalized content and contain no source-specific parsing.
-- Route files compose layouts, metadata, and static parameters only.
-- Profile and CV facts live in `content/profile.json`, never in page markup.
-- Colors are CSS tokens in `app/globals.css`, defined with `light-dark()` for both schemes.
-- Generated macro data and build output are never committed.
+- Research content lives under `content/`; components never contain it.
+- Only `lib/` reads the filesystem; routes compose layout, metadata and static params.
+- Math is MathML rendered at build time: pages ship no math JavaScript. Inline big
+  operators (`\sum`, `\max`, starred operators) set their limits under the symbol.
+- Interactive figures are SVG components registered in `components/figures/index.ts`
+  and referenced from content by id. Content does not load plotting libraries.
+- Styles are plain CSS with nesting and `light-dark()` tokens; each route imports only
+  the stylesheet it needs.
+- Generated data and build output are never committed.

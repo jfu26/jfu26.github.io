@@ -1,0 +1,13 @@
+[
+  {
+    "id": "gerzensee",
+    "title": "Study Center Gerzensee",
+    "groups": [
+      { "id": "micro", "title": "Microeconomics" },
+      { "id": "macro", "title": "Macroeconomics" },
+      { "id": "metrics", "title": "Econometrics" }
+    ]
+  },
+  { "id": "master", "title": "Master in International Economics" },
+  { "id": "others", "title": "Others" }
+]

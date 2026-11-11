@@ -1,16 +1,14 @@
 import type { MetadataRoute } from "next";
-import { getPosts } from "@/lib/content";
-import { getCourses } from "@/lib/notes";
+import { getNotes } from "@/lib/notes";
 
 export const dynamic = "force-static";
 const site = "https://jfu26.github.io";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const pages = ["", "research/", "notes/", "posts/", "macro/", "cv/"].map((path) => ({ url: `${site}/${path}` }));
-  const notes = getCourses().flatMap((course) => [
-    { url: `${site}/notes/${course.slug}/`, lastModified: course.date },
-    ...course.chapters.map((chapter) => ({ url: `${site}/notes/${course.slug}/${chapter.slug}/`, lastModified: course.date })),
+  const pages = ["", "research/", "notes/", "macro/", "cv/"].map((path) => ({ url: `${site}/${path}` }));
+  const notes = getNotes().flatMap((note) => [
+    { url: `${site}/notes/${note.slug}/`, lastModified: note.date },
+    ...(note.kind === "course" ? note.chapters.map((chapter) => ({ url: `${site}/notes/${note.slug}/${chapter.slug}/`, lastModified: note.date })) : []),
   ]);
-  const posts = getPosts().map((post) => ({ url: `${site}/posts/${post.slug}/`, lastModified: post.date }));
-  return [...pages, ...notes, ...posts];
+  return [...pages, ...notes];
 }

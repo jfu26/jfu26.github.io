@@ -1,9 +1,9 @@
 # jfu26.github.io
 
 Academic website of a PhD student in International Economics at the Geneva
-Graduate Institute (IHEID), working in macroeconomics. The site combines an al-folio-style academic content architecture
-with static Markdown, LaTeX lecture notes, BibTeX, DOI, Jupyter, RMarkdown, build-time MathML (Temml), and reveal.js
-publishing.
+Graduate Institute (IHEID), working in macroeconomics: a statically exported Next.js
+site with a profile, research (BibTeX/DOI), CV, LaTeX and Markdown notes rendered to
+chaptered HTML with build-time MathML, and a global macro data atlas.
 
 ## Development
 
@@ -13,7 +13,7 @@ pnpm data
 pnpm dev
 ```
 
-Run `pnpm content:check` to validate content metadata and duplicate slugs. See
+Run `pnpm content:check` to validate notes and their sections. See
 [`ARCHITECTURE.md`](ARCHITECTURE.md) and [`content/README.md`](content/README.md)
 for the content model and authoring conventions.
 

@@ -1,60 +1,14 @@
 import "server-only";
 
-import { readFileSync, readdirSync } from "node:fs";
-import { extname, join, parse } from "node:path";
-import matter from "gray-matter";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { marked } from "marked";
 import profile from "@/content/profile.json";
 import { renderDelimited } from "./math";
 
 const CONTENT = join(process.cwd(), "content");
 
-export type ContentKind = "markdown" | "rmarkdown" | "html" | "notebook";
-
-export type ContentSummary = {
-  slug: string;
-  title: string;
-  date: string;
-  summary: string;
-  tags: string[];
-  kind: ContentKind;
-};
-
-export type WrittenPost = ContentSummary & {
-  kind: "markdown" | "rmarkdown" | "html";
-  html: string;
-};
-
-export type NotebookOutput = {
-  output_type: string;
-  text?: string[] | string;
-  data?: Record<string, string[] | string>;
-};
-
-export type NotebookCell = {
-  cell_type: "markdown" | "code";
-  source: string[] | string;
-  execution_count?: number | null;
-  outputs?: NotebookOutput[];
-};
-
-export type NotebookPost = ContentSummary & {
-  kind: "notebook";
-  cells: NotebookCell[];
-};
-
-export type Post = WrittenPost | NotebookPost;
-
-export type SlideDeck = {
-  slug: string;
-  title: string;
-  date: string;
-  summary: string;
-  markdown: string;
-};
-
 export type Publication = {
-  slug: string;
   citekey: string;
   type: string;
   title: string;
@@ -67,12 +21,6 @@ export type Publication = {
   code?: string;
   abstract?: string;
 };
-
-const asText = (value: string[] | string) => Array.isArray(value) ? value.join("") : value;
-const asDate = (value: unknown) => value instanceof Date
-  ? value.toISOString().slice(0, 10)
-  : String(value || "");
-const asTags = (value: unknown) => Array.isArray(value) ? value.map(String) : [];
 
 export function renderMarkdown(source: string) {
   const formulas: string[] = [];
@@ -108,76 +56,6 @@ export function slugify(value: string) {
     .normalize("NFKD").replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
-}
-
-function readWrittenPosts(): WrittenPost[] {
-  const directory = join(CONTENT, "posts");
-  return readdirSync(directory)
-    .filter((file) => [".md", ".rmd", ".html"].includes(extname(file).toLowerCase()))
-    .map((file) => {
-      const extension = extname(file).toLowerCase();
-      const source = readFileSync(join(directory, file), "utf8");
-      const { data, content } = matter(source);
-      return {
-        slug: parse(file).name,
-        title: String(data.title),
-        date: asDate(data.date),
-        summary: String(data.summary),
-        tags: asTags(data.tags),
-        kind: extension === ".rmd" ? "rmarkdown" : extension === ".html" ? "html" : "markdown",
-        html: extension === ".html" ? content : renderMarkdown(content),
-      };
-    });
-}
-
-function readNotebooks(): NotebookPost[] {
-  const directory = join(CONTENT, "notebooks");
-  return readdirSync(directory)
-    .filter((file) => extname(file) === ".ipynb")
-    .map((file) => {
-      const notebook = JSON.parse(readFileSync(join(directory, file), "utf8"));
-      const metadata = notebook.metadata?.jfu26 || {};
-      return {
-        slug: parse(file).name,
-        title: String(metadata.title),
-        date: asDate(metadata.date),
-        summary: String(metadata.summary),
-        tags: asTags(metadata.tags),
-        kind: "notebook",
-        cells: notebook.cells,
-      };
-    });
-}
-
-export function getPosts(): Post[] {
-  return [...readWrittenPosts(), ...readNotebooks()]
-    .sort((a, b) => b.date.localeCompare(a.date));
-}
-
-export function getPost(slug: string) {
-  return getPosts().find((post) => post.slug === slug);
-}
-
-export function getSlides(): SlideDeck[] {
-  const directory = join(CONTENT, "slides");
-  return readdirSync(directory)
-    .filter((file) => extname(file) === ".md")
-    .map((file) => {
-      const source = readFileSync(join(directory, file), "utf8");
-      const { data, content } = matter(source);
-      return {
-        slug: parse(file).name,
-        title: String(data.title),
-        date: asDate(data.date),
-        summary: String(data.summary),
-        markdown: content.trim(),
-      };
-    })
-    .sort((a, b) => b.date.localeCompare(a.date));
-}
-
-export function getSlide(slug: string) {
-  return getSlides().find((slide) => slide.slug === slug);
 }
 
 function cleanBibText(value = "") {
@@ -233,7 +111,7 @@ function parseBibtex(source: string): Publication[] {
     const comma = source.indexOf(",", open);
     const fields = parseFields(source.slice(comma + 1, end - 1));
     publications.push({
-      slug: slugify(citekey),
+
       citekey,
       type: header[1].toLowerCase(),
       title: fields.title || citekey,
@@ -263,12 +141,12 @@ async function importDoi(doi: string): Promise<Publication> {
       .join(" and ");
     const year = item.published?.["date-parts"]?.[0]?.[0] || item.issued?.["date-parts"]?.[0]?.[0] || "";
     return {
-      slug: slugify(doi), citekey: doi, type: item.type || "article", title: item.title?.[0] || doi,
+      citekey: doi, type: item.type || "article", title: item.title?.[0] || doi,
       authors, year: String(year), venue: item["container-title"]?.[0] || item.publisher || "", doi,
       url: item.URL, abstract: item.abstract,
     };
   } catch {
-    return { slug: slugify(doi), citekey: doi, type: "doi", title: doi, authors: "", year: "", venue: "", doi };
+    return { citekey: doi, type: "doi", title: doi, authors: "", year: "", venue: "", doi };
   }
 }
 
@@ -288,9 +166,5 @@ export function getPublications() {
   return publicationCache;
 }
 
-export async function getPublication(slug: string) {
-  return (await getPublications()).find((publication) => publication.slug === slug);
-}
-
-export { asText, profile };
+export { profile };
 export type Profile = typeof profile;

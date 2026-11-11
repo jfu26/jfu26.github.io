@@ -1,0 +1,44 @@
+/* Interactive SVG figures (components/figures). Imported by RichHtml. */
+figure.interactive { margin: 2em 0; }
+.plot { display: block; width: 100%; height: auto; overflow: visible; border: 1px solid var(--line); border-radius: 4px; background: var(--paper); font: 13px var(--sans); touch-action: none; user-select: none; }
+.plot text { fill: var(--muted); }
+.plot .axes line { stroke: var(--muted); stroke-width: 1; }
+.plot .axis-label { fill: var(--ink); font-size: 13.5px; font-style: italic; font-family: var(--serif); }
+.plot .series { fill: none; stroke-width: 2.4; stroke-linejoin: round; }
+.plot .s0 { stroke: var(--accent); fill: var(--accent); }
+.plot .s1 { stroke: var(--muted); fill: var(--muted); }
+.plot path.series { fill: none; }
+.plot .series-label { stroke: none; font-size: 13px; }
+.plot .dashed { stroke-dasharray: 6 5; stroke-width: 1.6; }
+.plot .guide { stroke: var(--line); stroke-width: 1; stroke-dasharray: 3 4; }
+.plot .tangent { stroke: var(--negative); stroke-width: 2; }
+.plot .measure { stroke: var(--ink); stroke-width: 1.2; }
+.plot .arrowhead { fill: var(--ink); }
+.plot .note { fill: var(--ink); font-size: 13px; }
+.plot .note.negative { fill: var(--negative); }
+.plot .gap { stroke: var(--negative); stroke-width: 2.4; stroke-dasharray: 2 3; }
+.plot .web { fill: none; stroke: var(--negative); stroke-width: 1.4; }
+.plot .steady-trap { fill: var(--negative); }
+.plot .fixed-point { fill: var(--ink); }
+.handle { cursor: grab; outline: none; }
+.handle:active { cursor: grabbing; }
+.handle .hit { fill: transparent; stroke: none; }
+.handle circle:not(.hit), .handle rect { stroke: var(--paper); stroke-width: 2; transition: r .1s; }
+.handle.tone-accent :is(circle:not(.hit), rect) { fill: var(--accent); }
+.handle.tone-ink :is(circle:not(.hit), rect) { fill: var(--ink); }
+.handle.tone-negative :is(circle:not(.hit), rect) { fill: var(--negative); }
+.handle text { fill: var(--ink); font: italic 600 15px var(--serif); paint-order: stroke; stroke: var(--paper); stroke-width: 4px; }
+.handle:hover circle:not(.hit) { r: 8.5px; }
+.handle:focus-visible .hit { stroke: var(--accent); stroke-width: 2; }
+.dag .dag-node circle { fill: var(--paper); stroke: var(--ink); stroke-width: 1.3; }
+.dag .dag-node text { fill: var(--ink); font: italic 19px var(--serif); }
+.dag .dag-edges line { stroke: var(--ink); stroke-width: 1.4; }
+.dag .dag-excluded path { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+.dag .dag-excluded text { fill: var(--muted); }
+.readout { margin: 10px 0 0; padding: 10px 14px; border-left: 3px solid var(--accent); background: var(--surface); font: 14.5px/1.6 var(--sans); }
+.readout b { font-weight: 600; }
+figure.interactive figcaption { margin-top: 8px; color: var(--muted); font: 14px/1.55 var(--sans); }
+.float-label { color: var(--ink); font-weight: 600; }
+
+
+@media (max-width: 560px) { .plot { font-size: 15px; } }

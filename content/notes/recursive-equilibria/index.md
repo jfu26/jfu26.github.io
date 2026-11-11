@@ -2,10 +2,7 @@
 title: Recursive Equilibria as Fixed Points
 date: 2026-08-01
 summary: A short note on Bellman operators, contraction, and the economic content of recursive equilibrium.
-tags:
-  - Macroeconomics
-  - Dynamic programming
-  - Theory
+section: others
 ---
 
 An infinite-horizon economic problem becomes manageable when tomorrow's problem has the same structure as today's. Let the state be $s\in\mathcal S$, the feasible action set be $A(s)$, and the transition kernel be $Q(s'\mid s,a)$. The Bellman operator is

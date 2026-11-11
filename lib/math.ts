@@ -5,12 +5,28 @@ export type Macros = Record<string, string>;
 
 const reported = new Set<string>();
 
+// Big operators whose limits always sit under/over the symbol, also in running text and fractions.
+const BIG_OPERATORS = "sum|prod|coprod|bigcup|bigcap|bigoplus|bigotimes|bigvee|bigwedge|max|min|sup|inf|lim|limsup|liminf";
+const limitsPattern = new WeakMap<Macros, RegExp>();
+const NO_MACROS: Macros = {};
+
+/** `\sum_{i=1}^n` → `\sum\limits_{i=1}^n`, also for `\DeclareMathOperator*` macros. */
+function limitsBelow(source: string, macros: Macros) {
+  let pattern = limitsPattern.get(macros);
+  if (!pattern) {
+    const starred = Object.keys(macros).filter((name) => macros[name].startsWith("\\operatorname*")).map((name) => name.slice(1));
+    pattern = new RegExp(`\\\\(${[BIG_OPERATORS, ...starred].join("|")})(?![a-zA-Z])(?!\\s*\\\\(?:no)?limits)(?=\\s*[_^])`, "g");
+    limitsPattern.set(macros, pattern);
+  }
+  return source.replace(pattern, "\\$1\\limits");
+}
+
 // Renders TeX to MathML Core at build time: browsers lay it out natively, so pages ship
 // no math JavaScript and stay small (about a seventh of KaTeX's HTML output).
-export function renderTex(source: string, display: boolean, macros: Macros = {}) {
+export function renderTex(source: string, display: boolean, macros: Macros = NO_MACROS) {
   try {
     // Temml may mutate the macro table on \gdef; each formula gets its own copy.
-    return temml.renderToString(source, { displayMode: display, wrap: display ? "none" : "tex", throwOnError: true, macros: { ...macros } });
+    return temml.renderToString(limitsBelow(source, macros), { displayMode: display, wrap: display ? "none" : "tex", throwOnError: true, macros: { ...macros } });
   } catch (error) {
     const message = `${(error as Error).message} in: ${source.slice(0, 80)}`;
     if (!reported.has(message)) console.warn(`[math] ${message}`);

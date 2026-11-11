@@ -2,9 +2,7 @@
 title: The Taylor Principle and the Zero Lower Bound
 date: 2026-11-10
 summary: An interactive diagram of a Taylor rule against the Fisher relation, showing the Taylor principle and the second, deflationary steady state created by the zero lower bound.
-tags:
-  - Monetary policy
-  - Interactive
+section: others
 ---
 
 In steady state the Fisher relation ties the nominal rate to inflation one for one, $i = r^\ast + \pi$. A Taylor rule with a zero lower bound sets
