@@ -1,5 +1,5 @@
 // Fails the build early on malformed notes: each folder is a LaTeX course
-// (notes.tex + meta.json + public/notes/<slug>.pdf) or a Markdown note (index.md),
+// (meta.json + public/notes/<slug>.pdf and .tex) or a Markdown note (index.md),
 // and every note belongs to a section declared in content/notes/sections.json.
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
@@ -16,17 +16,17 @@ for (const entry of readdirSync(root, { withFileTypes: true })) {
   const dir = join(root, entry.name);
   const where = `content/notes/${entry.name}`;
   let fields;
-  if (existsSync(join(dir, "notes.tex"))) {
+  if (existsSync(join(dir, "meta.json"))) {
     fields = JSON.parse(readFileSync(join(dir, "meta.json"), "utf8"));
     for (const key of ["title", "course", "institution", "date", "order"]) if (fields[key] === undefined) errors.push(`${where}/meta.json: missing ${key}`);
-    if (!existsSync(join(process.cwd(), "public", "notes", `${entry.name}.pdf`))) errors.push(`${where}: missing public/notes/${entry.name}.pdf`);
+    for (const ext of ["pdf", "tex"]) if (!existsSync(join(process.cwd(), "public", "notes", `${entry.name}.${ext}`))) errors.push(`${where}: missing public/notes/${entry.name}.${ext}`);
   } else if (existsSync(join(dir, "index.md"))) {
     const { data, content } = matter(readFileSync(join(dir, "index.md"), "utf8"));
     fields = data;
     for (const key of ["title", "date"]) if (!data[key]) errors.push(`${where}/index.md: missing ${key}`);
     if (!content.trim()) errors.push(`${where}/index.md: empty body`);
   } else {
-    errors.push(`${where}: expected notes.tex + meta.json or index.md`);
+    errors.push(`${where}: expected meta.json or index.md`);
     continue;
   }
   if (!sections.includes(fields.section)) errors.push(`${where}: section "${fields.section}" is not in sections.json (${sections.join(", ")})`);

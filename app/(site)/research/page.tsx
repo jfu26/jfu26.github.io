@@ -1,14 +1,7 @@
 import type { Metadata } from "next";
-import { getPublications, type Publication } from "@/lib/content";
+import { getPublications, profile, type Publication } from "@/lib/content";
 
 export const metadata: Metadata = { title: "Research" };
-
-const areas = [
-  ["Macroeconomic theory", "Recursive equilibrium, heterogeneous agents, and the mapping from information and market structure to aggregate dynamics."],
-  ["Monetary policy", "Policy rules, communication, and the expectations channel of transmission, including environments where it weakens, such as the effective lower bound."],
-  ["Expectations and forecasting", "Belief formation by households, firms, and professional forecasters, and what forecast errors reveal about information frictions."],
-  ["Geoeconomics and international finance", "Trade fragmentation, sanctions, and value-chain realignment, and how they change the cross-border transmission of shocks and the scope for domestic policy."],
-];
 
 const bibtex = (item: Publication) => [
   `@${item.type}{${item.citekey},`,
@@ -25,9 +18,7 @@ export default async function ResearchPage() {
 
       <section className="page-section">
         <h2>Research interests</h2>
-        <dl className="interest-list">
-          {areas.map(([title, text]) => <div key={title}><dt>{title}</dt><dd>{text}</dd></div>)}
-        </dl>
+        <p>{profile.interests.join(" · ")}</p>
       </section>
 
       <section className="page-section">
@@ -51,7 +42,6 @@ export default async function ResearchPage() {
           </ul>
         ) : <p className="muted">Papers will be posted here as drafts become available.</p>}
       </section>
-
     </>
   );
 }

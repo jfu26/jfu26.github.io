@@ -10,12 +10,19 @@ function NoteList({ notes }: { notes: Note[] }) {
     <ul className="note-list">
       {notes.map((note) => (
         <li key={note.slug}>
-          <Link href={`/notes/${note.slug}/`}>{note.title}</Link>
           {note.kind === "course" ? (
-            <span className="entry-meta">
-              {note.course}, {note.date.slice(0, 4)} · <a href={note.pdf}>PDF</a> · <a href={note.source}>TeX</a>
-            </span>
-          ) : <span className="entry-meta">{note.date.slice(0, 4)}</span>}
+            <>
+              <a href={note.pdf}>{note.title}</a>
+              <span className="entry-meta">
+                {note.course}, {note.date.slice(0, 4)} · <a href={note.pdf}>PDF</a> · <a href={note.tex}>TeX</a>
+              </span>
+            </>
+          ) : (
+            <>
+              <Link href={`/notes/${note.slug}/`}>{note.title}</Link>
+              <span className="entry-meta">{note.date.slice(0, 4)}</span>
+            </>
+          )}
         </li>
       ))}
     </ul>

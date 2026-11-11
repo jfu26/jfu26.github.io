@@ -1,6 +1,6 @@
 /*
  * Base styles shared by every page. Route-specific styles live next to their routes:
- * notes/notes.css, components/figures/figures.css, macro/atlas.css.
+ * components/figures/figures.css, macro/atlas.css.
  */
 
 /* Tokens: light-dark() resolves each against the reader's color scheme. */
@@ -84,7 +84,7 @@ main { padding-top: 8px; }
 .about h1, .page-heading { margin: 36px 0 6px; font-size: 32px; }
 .position { margin: 0 0 18px; color: var(--muted); font-size: 18px; line-height: 1.45; }
 .about p { margin: 0 0 14px; }
-.contact-links, .note-links { display: flex; flex-wrap: wrap; gap: 4px 20px; margin: 10px 0; font: 15px/1.5 var(--sans); }
+.contact-links { display: flex; flex-wrap: wrap; gap: 4px 20px; margin: 10px 0; font: 15px/1.5 var(--sans); }
 .breadcrumb {
   display: flex;
   flex-wrap: wrap;
@@ -130,12 +130,6 @@ main { padding-top: 8px; }
   details[open] summary { display: inline-block; border-color: var(--accent); color: var(--accent); }
   details > :not(summary) { margin: 10px 0 0; font: 14.5px/1.55 var(--serif); }
   pre { overflow-x: auto; padding: 10px 12px; background: var(--surface); font: 12.5px/1.5 var(--mono); }
-}
-.interest-list {
-  margin: 0;
-  div { margin-bottom: 12px; }
-  dt { font-weight: 600; }
-  dd { margin: 0; color: var(--muted); }
 }
 
 /* CV */

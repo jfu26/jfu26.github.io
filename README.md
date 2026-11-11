@@ -2,8 +2,8 @@
 
 Academic website of a PhD student in International Economics at the Geneva
 Graduate Institute (IHEID), working in macroeconomics: a statically exported Next.js
-site with a profile, research (BibTeX/DOI), CV, LaTeX and Markdown notes rendered to
-chaptered HTML with build-time MathML, and a global macro data atlas.
+site with a profile, research (BibTeX/DOI), CV, notes (PDF and TeX, plus short
+Markdown notes with build-time MathML), and a global macro data atlas.
 
 ## Development
 

@@ -1,20 +1,16 @@
 import { Fragment } from "react";
 import { figures } from "./figures";
-import Prose from "./Prose";
 import "./figures/figures.css";
 
 const FIGURE = /<figure data-figure="([\w-]+)"(?: id="([^"]*)")?>([\s\S]*?)<\/figure>/g;
 
 /**
  * Renders build-time HTML, swapping `<figure data-figure="id">caption</figure>` placeholders
- * for registered interactive figures. Chunks containing <script> go through Prose so author
- * scripts still run; everything else is static HTML with no client cost.
+ * for registered interactive figures. Everything else is static HTML with no client cost.
  */
 export default function RichHtml({ html, className = "prose" }: { html: string; className?: string }) {
   const parts = html.split(FIGURE);
-  const chunk = (source: string, key: number) => source.trim() && (source.includes("<script")
-    ? <Prose key={key} className="html-chunk" html={source} />
-    : <div key={key} className="html-chunk" dangerouslySetInnerHTML={{ __html: source }} />);
+  const chunk = (source: string, key: number) => source.trim() && <div key={key} className="html-chunk" dangerouslySetInnerHTML={{ __html: source }} />;
   const out = [chunk(parts[0], 0)];
   for (let i = 1; i < parts.length; i += 4) {
     const [id, anchor, caption, after] = parts.slice(i, i + 4);
