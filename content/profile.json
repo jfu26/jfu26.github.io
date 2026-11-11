@@ -1,0 +1,56 @@
+{
+  "name": "J. Fu",
+  "role": "PhD Student in International Economics",
+  "affiliation": "Geneva Graduate Institute (IHEID)",
+  "location": "Geneva, Switzerland",
+  "bio": "I work in macroeconomics. My research studies how beliefs about the future shape aggregate outcomes and policy: how households, firms, and markets form expectations, how monetary policy works through them, and how geoeconomic fragmentation changes the transmission of shocks across borders.",
+  "links": [
+    { "label": "GitHub", "href": "https://github.com/jfu26" }
+  ],
+  "interests": [
+    "Macroeconomic theory",
+    "Monetary policy",
+    "Expectations and forecasting",
+    "Geoeconomics",
+    "International finance"
+  ],
+  "education": [
+    {
+      "period": "2026–",
+      "degree": "PhD in International Economics",
+      "institution": "Geneva Graduate Institute (IHEID)"
+    },
+    {
+      "period": "2026–27",
+      "degree": "Beginning Doctoral Program",
+      "institution": "Study Center Gerzensee, Switzerland",
+      "detail": "Aug 2026 – Aug 2027"
+    },
+    {
+      "period": "2024–26",
+      "degree": "Master in Economics",
+      "institution": "Geneva Graduate Institute (IHEID)",
+      "detail": "International Finance and Macroeconomics track; International Trade track · Sep 2024 – Sep 2026"
+    }
+  ],
+  "experience": [
+    {
+      "period": "Oct 2026–",
+      "title": "Research Assistant",
+      "organization": "Geneva Platform for Resilient Value Chains (GPRVC)",
+      "detail": "Trade policy consulting · Geneva"
+    },
+    {
+      "period": "Mar–Aug 2026",
+      "title": "Economist (Intern)",
+      "organization": "International Trade Centre (ITC)",
+      "detail": "Flagship report: SME Competitiveness Survey (SMECS), The Bahamas · Geneva"
+    },
+    {
+      "period": "Feb–May 2026",
+      "title": "Research Assistant",
+      "organization": "Geneva Platform for Resilient Value Chains (GPRVC)",
+      "detail": "Overseas investment by Chinese wind and solar power enterprises · Geneva"
+    }
+  ]
+}

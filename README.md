@@ -1,7 +1,7 @@
 # jfu26.github.io
 
-Academic website for an incoming Economics PhD student at the Geneva Graduate
-Institute. The site combines an al-folio-style academic content architecture
+Academic website of a PhD student in International Economics at the Geneva
+Graduate Institute (IHEID), working in macroeconomics. The site combines an al-folio-style academic content architecture
 with static Markdown, BibTeX, DOI, Jupyter, RMarkdown, MathJax, and reveal.js
 publishing.
 

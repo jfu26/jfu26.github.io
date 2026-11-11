@@ -1,10 +1,11 @@
 import type { NotebookOutput, NotebookPost } from "@/lib/content";
 import { asText, renderMarkdown } from "@/lib/content";
 import ContentHeader from "./ContentHeader";
+import Prose from "./Prose";
 
 function Output({ output }: { output: NotebookOutput }) {
   if (output.data?.["text/html"]) {
-    return <div className="notebook-output rich-output" dangerouslySetInnerHTML={{ __html: asText(output.data["text/html"]) }} />;
+    return <Prose className="notebook-output rich-output" html={asText(output.data["text/html"])} />;
   }
   if (output.data?.["image/png"]) {
     return (

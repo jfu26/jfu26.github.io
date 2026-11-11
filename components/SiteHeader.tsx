@@ -1,18 +1,25 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const navigation = [
-  ["Research", "/research"],
-  ["Publications", "/publications"],
-  ["Posts", "/posts"],
-  ["Macro Atlas", "/macro"],
+  ["Research", "/research/"],
+  ["Publications", "/publications/"],
+  ["Writing", "/posts/"],
+  ["Macro Atlas", "/macro/"],
 ];
 
 export default function SiteHeader() {
+  const pathname = usePathname();
   return (
-    <header className="plain-header">
+    <header className="site-header">
+      <a className="skip-link" href="#main">Skip to content</a>
       <Link className="site-name" href="/">J. Fu</Link>
-      <nav aria-label="Primary navigation">
-        {navigation.map(([label, href]) => <Link href={href} key={href}>{label}</Link>)}
+      <nav aria-label="Primary">
+        {navigation.map(([label, href]) => (
+          <Link href={href} key={href} aria-current={pathname.startsWith(href.slice(0, -1)) ? "page" : undefined}>{label}</Link>
+        ))}
       </nav>
     </header>
   );

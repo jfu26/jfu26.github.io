@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import SiteHeader from "@/components/SiteHeader";
-import SiteFooter from "@/components/SiteFooter";
 import MarkdownArticle from "@/components/MarkdownArticle";
 import NotebookArticle from "@/components/NotebookArticle";
 import { getPost, getPosts } from "@/lib/content";
@@ -16,5 +14,5 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
   const post = getPost((await params).slug);
   if (!post) notFound();
-  return <main className="site-shell"><SiteHeader />{post.kind === "notebook" ? <NotebookArticle post={post} /> : <MarkdownArticle post={post} />}<SiteFooter /></main>;
+  return <>{post.kind === "notebook" ? <NotebookArticle post={post} /> : <MarkdownArticle post={post} />}</>;
 }

@@ -4,13 +4,14 @@ import type { ContentSummary } from "@/lib/content";
 const labels = {
   markdown: "Research note",
   rmarkdown: "RMarkdown",
+  html: "Interactive note",
   notebook: "Jupyter notebook",
 };
 
 export default function ContentHeader({ post }: { post: ContentSummary }) {
   return (
     <header className="content-header">
-      <Link className="content-back" href="/posts">← All posts</Link>
+      <Link className="content-back" href="/posts/">← All writing</Link>
       <p className="overline">{labels[post.kind]} · {post.date}</p>
       <h1>{post.title}</h1>
       <p className="content-summary">{post.summary}</p>

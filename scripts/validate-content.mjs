@@ -13,9 +13,9 @@ function recordSlug(file) {
   slugs.add(slug);
 }
 
-function validateMarkdown(directory) {
+function validateMarkdown(directory, extensions) {
   for (const file of readdirSync(join(root, directory))) {
-    if (![".md", ".rmd"].includes(extname(file).toLowerCase())) continue;
+    if (!extensions.includes(extname(file).toLowerCase())) continue;
     recordSlug(file);
     const { data, content } = matter(readFileSync(join(root, directory, file), "utf8"));
     for (const field of required) if (!data[field]) errors.push(`${directory}/${file}: missing ${field}`);
@@ -23,8 +23,8 @@ function validateMarkdown(directory) {
   }
 }
 
-validateMarkdown("posts");
-validateMarkdown("slides");
+validateMarkdown("posts", [".md", ".rmd", ".html"]);
+validateMarkdown("slides", [".md"]);
 
 for (const file of readdirSync(join(root, "notebooks"))) {
   if (extname(file) !== ".ipynb") continue;

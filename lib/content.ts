@@ -4,10 +4,11 @@ import { readFileSync, readdirSync } from "node:fs";
 import { extname, join, parse } from "node:path";
 import matter from "gray-matter";
 import { marked } from "marked";
+import profile from "@/content/profile.json";
 
 const CONTENT = join(process.cwd(), "content");
 
-export type ContentKind = "markdown" | "rmarkdown" | "notebook";
+export type ContentKind = "markdown" | "rmarkdown" | "html" | "notebook";
 
 export type ContentSummary = {
   slug: string;
@@ -19,7 +20,7 @@ export type ContentSummary = {
 };
 
 export type WrittenPost = ContentSummary & {
-  kind: "markdown" | "rmarkdown";
+  kind: "markdown" | "rmarkdown" | "html";
   html: string;
 };
 
@@ -79,7 +80,8 @@ function escapeMath(value: string) {
 export function renderMarkdown(source: string) {
   const formulas: string[] = [];
   const protectedSource = source
-    .split(/(```[\s\S]*?```|~~~[\s\S]*?~~~)/g)
+    // Code fences and raw <script>/<style> blocks pass through untouched so `$` in JS is not read as TeX.
+    .split(/(```[\s\S]*?```|~~~[\s\S]*?~~~|<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>)/gi)
     .map((part, index) => index % 2 ? part : part.replace(
       /\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)|(?<!\\)\$(?!\$)(?:\\.|[^$\n])+?(?<!\\)\$/g,
       (formula) => {
@@ -104,7 +106,7 @@ export function slugify(value: string) {
 function readWrittenPosts(): WrittenPost[] {
   const directory = join(CONTENT, "posts");
   return readdirSync(directory)
-    .filter((file) => [".md", ".rmd"].includes(extname(file).toLowerCase()))
+    .filter((file) => [".md", ".rmd", ".html"].includes(extname(file).toLowerCase()))
     .map((file) => {
       const extension = extname(file).toLowerCase();
       const source = readFileSync(join(directory, file), "utf8");
@@ -115,8 +117,8 @@ function readWrittenPosts(): WrittenPost[] {
         date: asDate(data.date),
         summary: String(data.summary),
         tags: asTags(data.tags),
-        kind: extension === ".rmd" ? "rmarkdown" : "markdown",
-        html: renderMarkdown(content),
+        kind: extension === ".rmd" ? "rmarkdown" : extension === ".html" ? "html" : "markdown",
+        html: extension === ".html" ? content : renderMarkdown(content),
       };
     });
 }
@@ -283,4 +285,5 @@ export async function getPublication(slug: string) {
   return (await getPublications()).find((publication) => publication.slug === slug);
 }
 
-export { asText };
+export { asText, profile };
+export type Profile = typeof profile;

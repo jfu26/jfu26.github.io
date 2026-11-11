@@ -14,5 +14,5 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function SlidesPage({ params }: { params: Promise<{ slug: string }> }) {
   const slide = getSlide((await params).slug);
   if (!slide) notFound();
-  return <main className="slides-page"><header><Link href="/posts">← Posts</Link><span>{slide.title}</span></header><SlideDeck markdown={slide.markdown} /></main>;
+  return <main className="slides-page"><header><Link href="/posts/">← Writing</Link><span>{slide.title}</span></header><SlideDeck markdown={slide.markdown} /></main>;
 }

@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import SiteHeader from "@/components/SiteHeader";
-import SiteFooter from "@/components/SiteFooter";
 import MacroAtlas from "./MacroAtlas";
 
 export const metadata: Metadata = {
@@ -10,8 +8,7 @@ export const metadata: Metadata = {
 
 export default function MacroPage() {
   return (
-    <main className="atlas-page">
-      <SiteHeader />
+    <div className="atlas-page">
       <section className="atlas-title">
         <p className="overline">Open data</p>
         <h1>Global Macro Atlas</h1>
@@ -21,7 +18,6 @@ export default function MacroPage() {
         </p>
       </section>
       <MacroAtlas />
-      <SiteFooter />
-    </main>
+    </div>
   );
 }
