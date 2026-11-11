@@ -5,7 +5,10 @@
   "location": "Geneva, Switzerland",
   "bio": "I work in macroeconomics. My research studies how beliefs about the future shape aggregate outcomes and policy: how households, firms, and markets form expectations, how monetary policy works through them, and how geoeconomic fragmentation changes the transmission of shocks across borders.",
   "links": [
-    { "label": "GitHub", "href": "https://github.com/jfu26" }
+    {
+      "label": "GitHub",
+      "href": "https://github.com/jfu26"
+    }
   ],
   "interests": [
     "Macroeconomic theory",
@@ -51,6 +54,20 @@
       "title": "Research Assistant",
       "organization": "Geneva Platform for Resilient Value Chains (GPRVC)",
       "detail": "Overseas investment by Chinese wind and solar power enterprises · Geneva"
+    }
+  ],
+  "policyWork": [
+    {
+      "year": "2026",
+      "title": "SME Competitiveness Survey: The Bahamas",
+      "organization": "International Trade Centre (ITC)",
+      "note": "Contributor to the flagship SMECS country report."
+    },
+    {
+      "year": "2026",
+      "title": "Overseas investment by Chinese wind and solar power enterprises",
+      "organization": "Geneva Platform for Resilient Value Chains (GPRVC)",
+      "note": "Research on the expansion of Chinese renewable-energy firms abroad."
     }
   ]
 }

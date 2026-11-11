@@ -4,10 +4,13 @@ This directory is the source of truth for research content.
 
 - `publications.bib`: BibTeX entries. Standard and custom links are rendered automatically.
 - `dois.txt`: one DOI per line. Crossref metadata is resolved during the build.
-- `profile.json`: name, role, bio, research interests, education, and experience shown on the home page.
+- `profile.json`: name, role, bio, research interests, education, experience, and policy work. Feeds the home, Research, and CV pages.
 - `posts/`: Markdown (`.md`), RMarkdown (`.Rmd`), and HTML (`.html`) notes with front matter.
-  Markdown may embed raw HTML and `<script>` blocks; scripts run in the browser
-  (see `taylor-rule-explorer.md`). Wrap interactive controls in `<div class="widget">`.
+  Markdown may embed raw HTML and `<script>` blocks; scripts run in the browser in
+  document order. Interactive figures use JSXGraph from the CDN: a `<div class="jxgbox">`
+  inside `<figure class="interactive">`, an optional `<div class="readout">`, then the
+  library `<script src>` and an inline script (see `taylor-rule-explorer.md` and
+  `recursive-equilibria.md`).
 - `notebooks/`: Jupyter notebooks. Add display metadata under `metadata.jfu26`.
 - `slides/`: reveal.js Markdown decks. Separate horizontal slides with `---`.
 

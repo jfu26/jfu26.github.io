@@ -12,12 +12,9 @@ export default function ContentHeader({ post }: { post: ContentSummary }) {
   return (
     <header className="content-header">
       <Link className="content-back" href="/posts/">← All writing</Link>
-      <p className="overline">{labels[post.kind]} · {post.date}</p>
       <h1>{post.title}</h1>
+      <p className="entry-meta">{post.date} · {labels[post.kind]}{post.tags.length ? ` · ${post.tags.join(", ")}` : ""}</p>
       <p className="content-summary">{post.summary}</p>
-      <ul className="tag-list" aria-label="Topics">
-        {post.tags.map((tag) => <li key={tag}>{tag}</li>)}
-      </ul>
     </header>
   );
 }

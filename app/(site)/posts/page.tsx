@@ -11,17 +11,30 @@ export default function PostsPage() {
   const slides = getSlides();
   return (
     <>
-      <header className="page-title"><h1>Writing</h1><p>Mathematical notes, interactive notes, computational notebooks, and slides.</p></header>
-      <section className="collection-section">
+      <h1 className="page-heading">Writing</h1>
+      <p className="muted">Research notes, interactive notes, computational notebooks, and slides.</p>
+      <section className="page-section">
         <h2>Notes and notebooks</h2>
         <ul className="entry-list">
-          {posts.map((post) => <li key={post.slug}><div><span className="entry-kind">{kindLabel[post.kind]}</span><Link href={`/posts/${post.slug}/`}>{post.title}</Link><p>{post.summary}</p><small>{post.tags.join(" · ")}</small></div><time>{post.date}</time></li>)}
+          {posts.map((post) => (
+            <li key={post.slug}>
+              <Link href={`/posts/${post.slug}/`}>{post.title}</Link>
+              <span className="entry-meta">{post.date} · {kindLabel[post.kind]}{post.tags.length ? ` · ${post.tags.join(", ")}` : ""}</span>
+              <p>{post.summary}</p>
+            </li>
+          ))}
         </ul>
       </section>
-      <section className="collection-section">
+      <section className="page-section">
         <h2>Slides</h2>
         <ul className="entry-list">
-          {slides.map((slide) => <li key={slide.slug}><div><span className="entry-kind">reveal.js</span><Link href={`/slides/${slide.slug}/`}>{slide.title}</Link><p>{slide.summary}</p></div><time>{slide.date}</time></li>)}
+          {slides.map((slide) => (
+            <li key={slide.slug}>
+              <Link href={`/slides/${slide.slug}/`}>{slide.title}</Link>
+              <span className="entry-meta">{slide.date} · reveal.js</span>
+              <p>{slide.summary}</p>
+            </li>
+          ))}
         </ul>
       </section>
     </>

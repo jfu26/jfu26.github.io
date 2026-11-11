@@ -79,20 +79,30 @@ function escapeMath(value: string) {
 
 export function renderMarkdown(source: string) {
   const formulas: string[] = [];
+  const rawBlocks: string[] = [];
   const protectedSource = source
-    // Code fences and raw <script>/<style> blocks pass through untouched so `$` in JS is not read as TeX.
+    // Code fences go to marked untouched; <script>/<style> bypass marked entirely
+    // (it would read JS backticks as code spans) and `$` inside them is never TeX.
     .split(/(```[\s\S]*?```|~~~[\s\S]*?~~~|<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>)/gi)
-    .map((part, index) => index % 2 ? part : part.replace(
-      /\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)|(?<!\\)\$(?!\$)(?:\\.|[^$\n])+?(?<!\\)\$/g,
-      (formula) => {
-        const token = `MATHPLACEHOLDER${formulas.length}TOKEN`;
-        formulas.push(escapeMath(formula));
-        return token;
-      },
-    ))
+    .map((part, index) => {
+      if (index % 2) {
+        if (!/^<(script|style)/i.test(part)) return part;
+        rawBlocks.push(part);
+        return `<!--RAWBLOCK${rawBlocks.length - 1}-->`;
+      }
+      return part.replace(
+        /\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)|(?<!\\)\$(?!\$)(?:\\.|[^$\n])+?(?<!\\)\$/g,
+        (formula) => {
+          const token = `MATHPLACEHOLDER${formulas.length}TOKEN`;
+          formulas.push(escapeMath(formula));
+          return token;
+        },
+      );
+    })
     .join("");
   return (marked.parse(protectedSource, { gfm: true }) as string)
-    .replace(/MATHPLACEHOLDER(\d+)TOKEN/g, (_, index) => formulas[Number(index)]);
+    .replace(/MATHPLACEHOLDER(\d+)TOKEN/g, (_, index) => formulas[Number(index)])
+    .replace(/<!--RAWBLOCK(\d+)-->/g, (_, index) => rawBlocks[Number(index)]);
 }
 
 export function slugify(value: string) {

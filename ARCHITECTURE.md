@@ -5,7 +5,7 @@ and routes have separate responsibilities.
 
 ```text
 content/                  Human-owned academic source files
-  profile.json           Name, role, interests, education, experience
+  profile.json           Name, role, interests, education, experience (home, Research, CV)
   publications.bib       BibTeX publication records
   dois.txt               DOI records imported from Crossref at build time
   posts/                  Markdown, RMarkdown, and HTML notes (inline HTML/JS allowed)
@@ -13,7 +13,7 @@ content/                  Human-owned academic source files
   slides/                 reveal.js Markdown decks
 lib/content.ts            Parsing and normalization boundary
 components/               Shared academic layout and content renderers
-  Prose.tsx              Renders post HTML and executes its <script> tags
+  Prose.tsx              Renders post HTML and runs its <script> tags in order
 app/(site)/               Site pages sharing one header/footer layout
 app/slides/               Full-screen reveal.js decks, outside the site shell
 scripts/                  Content validation and macro-data ingestion
