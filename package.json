@@ -23,6 +23,7 @@
     "react": "19.2.6",
     "react-dom": "19.2.6",
     "reveal.js": "^6.0.1",
+    "temml": "0.14.0",
     "topojson-client": "3.1.0"
   },
   "devDependencies": {

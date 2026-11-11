@@ -24,10 +24,6 @@ export default function CvPage() {
       <section className="page-section"><h2>Education</h2><CvList entries={education(profile.education)} /></section>
       <section className="page-section"><h2>Research interests</h2><p>{profile.interests.map((x, i) => (i ? x.toLowerCase() : x)).join(", ")}.</p></section>
       <section className="page-section"><h2>Professional experience</h2><CvList entries={experience(profile.experience)} /></section>
-      <section className="page-section">
-        <h2>Policy and applied research</h2>
-        <CvList entries={profile.policyWork.map((w) => ({ period: w.year, heading: w.title, place: w.organization, detail: w.note }))} />
-      </section>
       <p className="muted cv-updated">Last updated {updated}.</p>
     </article>
   );

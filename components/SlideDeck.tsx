@@ -10,11 +10,12 @@ export default function SlideDeck({ markdown }: { markdown: string }) {
     let cancelled = false;
     let deck: { destroy: () => void } | undefined;
     const initialize = async () => {
-      const [{ default: Reveal }, { default: Markdown }, { default: Highlight }, { default: Notes }] = await Promise.all([
+      const [{ default: Reveal }, { default: Markdown }, { default: Highlight }, { default: Notes }, { default: RevealMath }] = await Promise.all([
         import("reveal.js"),
         import("reveal.js/plugin/markdown"),
         import("reveal.js/plugin/highlight"),
         import("reveal.js/plugin/notes"),
+        import("reveal.js/plugin/math"),
       ]);
       if (cancelled || !root.current) return;
       const instance = new Reveal(root.current, {
@@ -23,11 +24,12 @@ export default function SlideDeck({ markdown }: { markdown: string }) {
         transition: "none",
         controls: true,
         progress: true,
-        plugins: [Markdown, Highlight, Notes],
+        // Slides are rendered client-side by reveal, so math uses its KaTeX plugin (pinned).
+        katex: { version: "0.16.22" },
+        plugins: [Markdown, Highlight, Notes, RevealMath.KaTeX],
       });
       deck = instance;
       await instance.initialize();
-      await window.MathJax?.typesetPromise?.([root.current]);
     };
     void initialize();
     return () => { cancelled = true; deck?.destroy(); };

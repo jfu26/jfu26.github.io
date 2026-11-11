@@ -2,7 +2,7 @@
 
 Academic website of a PhD student in International Economics at the Geneva
 Graduate Institute (IHEID), working in macroeconomics. The site combines an al-folio-style academic content architecture
-with static Markdown, BibTeX, DOI, Jupyter, RMarkdown, MathJax, and reveal.js
+with static Markdown, LaTeX lecture notes, BibTeX, DOI, Jupyter, RMarkdown, build-time MathML (Temml), and reveal.js
 publishing.
 
 ## Development

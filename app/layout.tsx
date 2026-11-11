@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { IBM_Plex_Mono, Inter, Source_Serif_4 } from "next/font/google";
-import MathJaxSync from "@/components/MathJaxSync";
+import "temml/dist/Temml-Local.css";
+import { profile } from "@/lib/content";
 import "./globals.css";
 
 const serif = Source_Serif_4({
@@ -35,14 +35,20 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const person = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: profile.name,
+    url: "https://jfu26.github.io",
+    jobTitle: profile.role,
+    affiliation: { "@type": "CollegeOrUniversity", name: profile.affiliation },
+    knowsAbout: profile.interests,
+    sameAs: profile.links.map((link) => link.href),
+  };
   return (
     <html lang="en">
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: `window.MathJax={tex:{inlineMath:[["$","$"],["\\\\(","\\\\)"]],displayMath:[["$$","$$"],["\\\\[","\\\\]"]],processEscapes:true},chtml:{displayAlign:"left"},options:{enableMenu:false}};` }} />
-        <script defer src="https://cdn.jsdelivr.net/npm/mathjax@4.0.0/tex-chtml.js" />
-      </head>
       <body className={`${serif.variable} ${sans.variable} ${mono.variable}`}>
-        <Suspense><MathJaxSync /></Suspense>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(person) }} />
         {children}
       </body>
     </html>

@@ -5,6 +5,7 @@ import { extname, join, parse } from "node:path";
 import matter from "gray-matter";
 import { marked } from "marked";
 import profile from "@/content/profile.json";
+import { renderDelimited } from "./math";
 
 const CONTENT = join(process.cwd(), "content");
 
@@ -73,10 +74,6 @@ const asDate = (value: unknown) => value instanceof Date
   : String(value || "");
 const asTags = (value: unknown) => Array.isArray(value) ? value.map(String) : [];
 
-function escapeMath(value: string) {
-  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
 export function renderMarkdown(source: string) {
   const formulas: string[] = [];
   const rawBlocks: string[] = [];
@@ -94,7 +91,7 @@ export function renderMarkdown(source: string) {
         /\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)|(?<!\\)\$(?!\$)(?:\\.|[^$\n])+?(?<!\\)\$/g,
         (formula) => {
           const token = `MATHPLACEHOLDER${formulas.length}TOKEN`;
-          formulas.push(escapeMath(formula));
+          formulas.push(renderDelimited(formula));
           return token;
         },
       );
@@ -108,7 +105,7 @@ export function renderMarkdown(source: string) {
 export function slugify(value: string) {
   return value
     .toLowerCase()
-    .normalize("NFKD")
+    .normalize("NFKD").replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
 }

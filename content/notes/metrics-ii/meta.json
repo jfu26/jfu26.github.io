@@ -1,0 +1,13 @@
+{
+  "title": "Linear Models, Asymptotics, and Instrumental Variables",
+  "course": "Econometrics II",
+  "institution": "Study Center Gerzensee, Doctoral Program in Economics",
+  "term": "2026",
+  "date": "2026-10-26",
+  "order": 2,
+  "figures": {
+    "fig:iv": "iv-dag",
+    "fig:power": "power-local"
+  },
+  "credit": "Integrated from the slides of Bo E. Honoré (Hayashi, Econometrics, Chapters 1–3, and the asymptotics review)."
+}

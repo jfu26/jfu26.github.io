@@ -1,0 +1,13 @@
+{
+  "title": "Probability and Statistical Inference for Econometrics",
+  "course": "Econometrics I",
+  "institution": "Study Center Gerzensee, Doctoral Program in Economics",
+  "term": "2026",
+  "date": "2026-11-02",
+  "order": 1,
+  "figures": {
+    "fig:power": "power-one-sided",
+    "fig:trinity": "likelihood-trinity"
+  },
+  "credit": "Integrated from the ten lectures, the lecture notes of Anna Mikusheva, and the Week 1 take-home problem set."
+}

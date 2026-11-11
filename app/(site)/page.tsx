@@ -1,9 +1,11 @@
 import Link from "next/link";
 import CvList, { education } from "@/components/CvList";
 import { getPosts, profile } from "@/lib/content";
+import { getCourses } from "@/lib/notes";
 
 export default function Home() {
   const posts = getPosts().slice(0, 3);
+  const courses = getCourses();
   return (
     <>
       <section className="about">
@@ -20,6 +22,18 @@ export default function Home() {
       <section className="page-section">
         <h2>Education</h2>
         <CvList entries={education(profile.education)} />
+      </section>
+
+      <section className="page-section">
+        <h2>Notes</h2>
+        <ul className="entry-list">
+          {courses.map((course) => (
+            <li key={course.slug}>
+              <Link href={`/notes/${course.slug}/`}>{course.title}</Link>
+              <span className="entry-meta">{course.course} · {course.institution} · <a href={course.pdf}>PDF</a></span>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section className="page-section">

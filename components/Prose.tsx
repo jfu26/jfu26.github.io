@@ -6,7 +6,7 @@ const started = new WeakSet<Element>();
 
 // Renders author-owned HTML and runs its <script> tags, which innerHTML leaves inert.
 // Scripts run in document order: an external library finishes loading before the
-// inline figure code below it runs. MathJaxSync typesets the page afterwards.
+// inline figure code below it runs. Math is already rendered at build time.
 export default function Prose({ html, className = "prose" }: { html: string; className?: string }) {
   const root = useRef<HTMLDivElement>(null);
 

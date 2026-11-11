@@ -5,9 +5,10 @@ import { usePathname } from "next/navigation";
 
 const navigation = [
   ["Research", "/research/"],
-  ["CV", "/cv/"],
+  ["Notes", "/notes/"],
   ["Writing", "/posts/"],
   ["Data", "/macro/"],
+  ["CV", "/cv/"],
 ];
 
 export default function SiteHeader() {

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getPublications, profile } from "@/lib/content";
+import { getPublications } from "@/lib/content";
 
 export const metadata: Metadata = { title: "Research" };
 
@@ -39,18 +39,6 @@ export default async function ResearchPage() {
         ) : <p className="muted">Work in progress. Papers will be posted here as drafts become available.</p>}
       </section>
 
-      <section className="page-section">
-        <h2>Policy and applied research</h2>
-        <ul className="paper-list">
-          {profile.policyWork.map((item) => (
-            <li key={item.title}>
-              <strong>{item.title}</strong>
-              <span>{item.organization}, {item.year}</span>
-              <span className="entry-meta">{item.note}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
     </>
   );
 }
