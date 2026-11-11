@@ -41,8 +41,10 @@ h1, h2, h3 { font-weight: 600; line-height: 1.25; text-wrap: balance; }
 p, li, dd, figcaption { text-wrap: pretty; }
 .muted { color: var(--muted); }
 
-/* Math (MathML from Temml). STIX Two Math matches the serif text; the rest are fallbacks. */
-math { font-family: "STIX Two Math", "Cambria Math", "Latin Modern Math", "Noto Sans Math", math; font-size: 1.04em; }
+/* Math (MathML from Temml) in TeX Gyre Pagella Math, the companion of the Palatino text face. */
+math { font-family: var(--font-math), "STIX Two Math", "Cambria Math", math; font-size: 1em; }
+/* Temml pads each inline row by .5ex, which opens up the leading around every formula. */
+math > mrow { padding: 0; }
 math[display="block"] { margin-block: .7em; overflow-x: auto; overflow-y: hidden; padding-block: 2px; }
 .tex-error { color: var(--negative); }
 

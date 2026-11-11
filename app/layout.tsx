@@ -1,13 +1,28 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, Inter, Source_Serif_4 } from "next/font/google";
+import { IBM_Plex_Mono, Inter } from "next/font/google";
+import localFont from "next/font/local";
 import "temml/dist/Temml-Local.css";
 import { profile } from "@/lib/content";
 import "./globals.css";
 
-const serif = Source_Serif_4({
+// TeX Gyre Pagella (Palatino), matching the mathpazo typesetting of the PDF notes,
+// with its OpenType math companion for MathML. See app/fonts/README.md.
+const serif = localFont({
   variable: "--font-serif",
-  subsets: ["latin"],
-  style: ["normal", "italic"],
+  src: [
+    { path: "./fonts/pagella-regular.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/pagella-italic.woff2", weight: "400", style: "italic" },
+    { path: "./fonts/pagella-bold.woff2", weight: "700", style: "normal" },
+    { path: "./fonts/pagella-bolditalic.woff2", weight: "700", style: "italic" },
+  ],
+  fallback: ["Palatino Linotype", "Palatino", "Book Antiqua", "Georgia", "serif"],
+});
+
+const math = localFont({
+  variable: "--font-math",
+  src: "./fonts/pagella-math.woff2",
+  preload: false,
+  fallback: ["STIX Two Math", "Cambria Math", "math"],
 });
 
 const sans = Inter({
@@ -46,8 +61,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     sameAs: profile.links.map((link) => link.href),
   };
   return (
-    <html lang="en">
-      <body className={`${serif.variable} ${sans.variable} ${mono.variable}`}>
+    <html lang="en-GB">
+      <body className={`${serif.variable} ${math.variable} ${sans.variable} ${mono.variable}`}>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(person) }} />
         {children}
       </body>

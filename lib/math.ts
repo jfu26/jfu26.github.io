@@ -5,7 +5,8 @@ export type Macros = Record<string, string>;
 
 const reported = new Set<string>();
 
-// Big operators whose limits always sit under/over the symbol, also in running text and fractions.
+// Big operators whose limits sit under/over the symbol throughout display math, fractions included.
+// Inline math keeps TeX's side limits so running text keeps an even line spacing.
 const BIG_OPERATORS = "sum|prod|coprod|bigcup|bigcap|bigoplus|bigotimes|bigvee|bigwedge|max|min|sup|inf|lim|limsup|liminf";
 const limitsPattern = new WeakMap<Macros, RegExp>();
 const NO_MACROS: Macros = {};
@@ -26,7 +27,7 @@ function limitsBelow(source: string, macros: Macros) {
 export function renderTex(source: string, display: boolean, macros: Macros = NO_MACROS) {
   try {
     // Temml may mutate the macro table on \gdef; each formula gets its own copy.
-    return temml.renderToString(limitsBelow(source, macros), { displayMode: display, wrap: display ? "none" : "tex", throwOnError: true, macros: { ...macros } });
+    return temml.renderToString(display ? limitsBelow(source, macros) : source, { displayMode: display, wrap: display ? "none" : "tex", throwOnError: true, macros: { ...macros } });
   } catch (error) {
     const message = `${(error as Error).message} in: ${source.slice(0, 80)}`;
     if (!reported.has(message)) console.warn(`[math] ${message}`);

@@ -18,6 +18,7 @@ components/
   NotesToc.tsx, CvList.tsx, Site*.tsx, Prose.tsx, PrintButton.tsx
 app/
   layout.tsx, globals.css   Root document, fonts, base styles, Person JSON-LD
+  fonts/                    Self-hosted TeX Gyre Pagella text + math (GUST licence)
   (site)/                   Home, research, notes, cv, macro (shared header/footer)
   (site)/notes/notes.css    Notes-only styles (LaTeX environments, contents sidebar)
   (site)/macro/atlas.css    Atlas-only styles
@@ -36,8 +37,11 @@ scripts/                    Content validation, macro-data ingestion
 
 - Research content lives under `content/`; components never contain it.
 - Only `lib/` reads the filesystem; routes compose layout, metadata and static params.
-- Math is MathML rendered at build time: pages ship no math JavaScript. Inline big
-  operators (`\sum`, `\max`, starred operators) set their limits under the symbol.
+- Math is MathML rendered at build time: pages ship no math JavaScript. Display big
+  operators (`\sum`, `\max`, starred operators) set their limits under the symbol;
+  inline math keeps TeX's side limits so running text keeps an even leading.
+- Notes follow the PDF's typesetting: Palatino text and math (TeX Gyre Pagella),
+  justified paragraphs with indents, amsthm run-in heads, booktabs tables.
 - Interactive figures are SVG components registered in `components/figures/index.ts`
   and referenced from content by id. Content does not load plotting libraries.
 - Styles are plain CSS with nesting and `light-dark()` tokens; each route imports only

@@ -85,6 +85,13 @@ function readGroup(text: string, at: number, optional = false): [string | undefi
   return [text.slice(i + 1, end - 1), end];
 }
 
+/** Puts a run-in head at the start of the first paragraph (and a tail at the end of the last), as LaTeX does. */
+function runIn(head: string, html: string, tail = "") {
+  const body = html.startsWith("<p>") ? `<p>${head}${html.slice(3)}` : `<p>${head}</p>${html}`;
+  if (!tail) return body;
+  return body.endsWith("</p>") ? `${body.slice(0, -4)}${tail}</p>` : `${body}<p>${tail}</p>`;
+}
+
 const escapeHtml = (value: string) => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 /** Splits at top-level occurrences of `separator`, ignoring those inside groups or nested environments. */
@@ -187,7 +194,8 @@ class Converter {
       const isDisplay = env || display !== undefined;
       if (isDisplay) {
         const ids = labels.map((entry) => slugify(entry.split(MARK)[0]));
-        html = `<span class="equation"${ids[0] ? ` id="${ids[0]}"` : ""}>${ids.slice(1).map((id) => `<span id="${id}"></span>`).join("")}${html}</span>`;
+        // The <br> ends the preceding text line, so justification leaves it ragged as in TeX.
+        html = `<br class="eq"><span class="equation"${ids[0] ? ` id="${ids[0]}"` : ""}>${ids.slice(1).map((id) => `<span id="${id}"></span>`).join("")}${html}</span>`;
       }
       this.formulas.push(html);
       if (labels.length) this.formulaLabels.set(index, labels);
@@ -334,17 +342,20 @@ class Converter {
 
     if (name in THEOREMS || name === "assumption" || name === "asmset") {
       const title = name === "asmset" ? "Assumptions" : name === "assumption" ? "Assumption" : THEOREMS[name];
-      const note = option ? ` <span class="thm-note">(${this.inline(option)})</span>` : "";
+      const note = option ? ` (${this.inline(option)})` : "";
+      // thmtools styles of the PDF: "thm" sets the body in italics, "defn" upright.
       const kind = ["definition", "example", "remark", "assumption", "asmset"].includes(name) ? "plain" : "theorem";
-      return `<div class="thm thm-${kind}"${id}><p class="thm-head"><strong>${title}${number ? ` ${number}` : ""}.</strong>${note}</p>${this.blocksToHtml(body.replace(/^\s*\\leavevmode/, ""))}</div>`;
+      const head = `<strong class="thm-head">${title}${number ? ` ${number}` : ""}${note}.</strong> `;
+      return `<div class="thm thm-${kind}"${id}>${runIn(head, this.blocksToHtml(body.replace(/^\s*\\leavevmode/, "")))}</div>`;
     }
     switch (name) {
       case "whybox": {
         const [question, after] = readGroup(body, 0);
-        return `<aside class="why"><p class="why-head"><span>Why</span> <em>${this.inline(question ?? "")}</em></p>${this.blocksToHtml(body.slice(after))}</aside>`;
+        return `<aside class="why"><p class="why-head"><span class="sc">Why</span> <em>${this.inline(question ?? "")}</em></p>${this.blocksToHtml(body.slice(after))}</aside>`;
       }
       case "proof":
-        return `<details class="proof"><summary>${option ? this.inline(option) : "Proof"}</summary>${this.blocksToHtml(body)}<p class="qed" aria-hidden="true">∎</p></details>`;
+        // amsthm: run-in italic "Proof." and a tombstone at the end of the last line.
+        return `<div class="proof">${runIn(`<em class="proof-head">${option ? this.inline(option) : "Proof"}.</em> `, this.blocksToHtml(body), '<span class="qed" aria-hidden="true">∎</span>')}</div>`;
       case "itemize":
       case "enumerate":
       case "description":
@@ -389,7 +400,7 @@ class Converter {
       return ["", consumed];
     }).replace(/\\label\{([^}]+)\}/, (_, found) => { label ??= found; return ""; });
     const anchor = label ? ` id="${slugify(label)}"` : id;
-    const captionHtml = `<span class="float-label">${kind === "table" ? "Table" : "Figure"} ${number}.</span> ${this.inline(caption)}`;
+    const captionHtml = `<span class="float-label">${kind === "table" ? "Table" : "Figure"}&nbsp;${number}.</span> ${this.inline(caption)}`;
     if (kind === "table") {
       return `<figure class="table-float"${anchor}><figcaption>${captionHtml}</figcaption>${this.blocksToHtml(content)}</figure>`;
     }
@@ -423,7 +434,11 @@ class Converter {
     text = this.convertInline(text, keep);
     return text
       .replace(/\u0002(\d+)\u0002/g, (_, index) => escapes[Number(index)])
-      .replace(/\u0001(\d+)\u0001/g, (_, index) => this.formulas[Number(index)])
+      // An inline formula and the punctuation after it never split across lines.
+      .replace(/\u0001(\d+)\u0001([.,;:!?)]+)?/g, (_, index, punct) => {
+        const html = this.formulas[Number(index)];
+        return punct && !html.startsWith('<br class="eq">') ? `<span class="nobr">${html}${punct}</span>` : `${html}${punct ?? ""}`;
+      })
       .replace(/⟦([^⟧]+)⟧/g, (_, label) => this.labels.get(label)?.number ?? "??");
   }
 
